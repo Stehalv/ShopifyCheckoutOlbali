@@ -1,0 +1,280 @@
+﻿@model ShopifyApp.ViewModels.OrderDetailsViewModel
+@{
+    ViewBag.Title = "Order Details #" + Model.Order.Id;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <style>
+        #sub-menu {
+            height: 100vh;
+            background-color: #f6f6f7;
+            border-right: 1px solid #8c9196;
+        }
+    </style>
+    <div id="sub-menu" class="col-md-2">
+        <h3>Order details</h3>
+        <div class="col-12">
+            <dl>
+                <dt>
+                    App OrderID
+                </dt>
+                <dd>
+                    @Model.Order.Id
+                </dd>
+                <dt>
+                    Exigo Order#
+                </dt>
+                <dd>
+                    @Model.ExigoOrder.OrderID
+                </dd>
+                <dt>
+                    Shopify Order#
+                </dt>
+                <dd>
+                    @Model.ShopOrder.OrderNumber
+                </dd>
+                <dt>
+                    Shopify OrderID
+                </dt>
+                <dd>
+                    @Model.ShopOrder.Id
+                </dd>
+            </dl>
+        </div>
+        <div class="col-sm-12">
+            <hr />
+            <a data-role="display" data-id="summary">Summary</a>
+        </div>
+        <div class="col-sm-12">
+            <a data-role="display" data-id="exigo">Exigo Order</a>
+        </div>
+        <div class="col-sm-12">
+            <a data-role="display" data-id="shopify">Shopify Order</a>
+        </div>
+        <div class="col-sm-12">
+            <a href="@Url.Action("CustomerDetailsExigoId", "Customer", new { id = Model.Order.ExigoCustomerId, tenantConfigId = Model.Order.TenantConfigId } )">Customer</a>
+        </div>
+        <div class="col-sm-12">
+            <hr />
+            <a href="@Url.Action("Index", "Order")">Back to orders</a>
+        </div>
+    </div>
+    <div id="content" class="col-md-10" style="padding:20px">
+        <div class="row content-container" id="summary">
+            <div class="col-xs-4">
+                <dl class="dl-horizontal">
+                    <dt>
+                        Exigo Order Total
+                    </dt>
+                    <dd>
+                        @Model.ExigoOrder.Total.ToString("c")
+                    </dd>
+                    <dt>
+                        Shopify Order Total
+                    </dt>
+                    <dd>
+                        @Model.ShopOrder.TotalPrice.Value.ToString("c")
+                    </dd>
+                    <dt>
+                        Exigo Tax Total
+                    </dt>
+                    <dd>
+                        @Model.ExigoOrder.TaxTotal.ToString("c")
+                    </dd>
+                    <dt>
+                        Shopify Tax Total
+                    </dt>
+                    <dd>
+                        @Model.ShopOrder.TotalTax.Value.ToString("c")
+                    </dd>
+                </dl>
+            </div>
+            <div class="col-xs-8">
+                <h3>OrderLog</h3>
+                <table width="100%">
+                    <tr>
+                        <th>Message</th>
+                        <th>Date</th>
+                    </tr>
+                    @foreach (var log in Model.Log)
+                    {
+                        <tr>
+                            <td>@log.Message</td>
+                            <td>@log.CreatedDate.ToString()</td>
+                        </tr>
+                    }
+                </table>
+                <hr />
+            </div>
+        </div>
+
+        <div class="row content-container" id="shopify" style="display:none">
+            <div class="col-xs-6">
+                <h2>Shop Order</h2>
+                <dl>
+                    <dt>Order#</dt>
+                    <dd>@Model.ShopOrder.Id</dd>
+                    <dt>Total</dt>
+                    <dd>@Model.ShopOrder.TotalPrice.Value.ToString("c")</dd>
+                    <dt>Tax</dt>
+                    <dd>@Model.ShopOrder.TotalTax.Value.ToString("c")</dd>
+                    <dt>Shipping</dt>
+                    <dd>@Model.ShopOrder.ShippingLines.ToList().Sum(c => c.Price.Value).ToString("c") </dd>
+                </dl>
+                <table width="100%">
+                    <tr>
+                        <th>SKU</th>
+                        <th>Description</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                    </tr>
+                    @foreach (var item in Model.ShopOrder.LineItems)
+                    {
+                        <tr>
+                            <td>
+                                @item.SKU
+                            </td>
+                            <td>
+                                @item.Name
+                            </td>
+                            <td>
+                                @item.Quantity
+                            </td>
+                            <td>
+                                @item.Price
+                            </td>
+                        </tr>
+                    }
+                    @if (Model.ShopOrder.TotalDiscounts > 0)
+                    {
+                        <tr>
+                            <td>
+                            </td>
+                            <td>
+                                Discount
+                            </td>
+                            <td>
+                                1
+                            </td>
+                            <td>
+                                -@Model.ShopOrder.TotalDiscounts
+                            </td>
+                        </tr>
+                    }
+                </table>
+                @if (Model.ShopOrder.Refunds.Any())
+                {
+                    <h3>Refunds</h3>
+                    <table width="50%">
+                        <tr>
+                            <th>
+                                Id
+                            </th>
+                            <th>
+                                Amount
+                            </th>
+                        </tr>
+                        @foreach (var refund in Model.ShopOrder.Refunds)
+                        {
+                            <tr>
+                                <td>
+                                    @refund.Id
+                                </td>
+                                <td>
+                                    @refund.Transactions.Sum(c => c.Amount.Value).ToString("c")
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                }
+            </div>
+            <div class="col-xs-6">
+                <pre id="json-shopify">@Model.ShopifyOrderJson</pre>
+            </div>
+        </div>
+
+        <div class="row content-container" id="exigo" style="display:none">
+            <div class="col-xs-6">
+                <h2>Exigo Order</h2>
+                <dl>
+                    <dt>Order#</dt>
+                    <dd>@Model.ExigoOrder.OrderID</dd>
+                    <dt>Total</dt>
+                    <dd>@Model.ExigoOrder.Total.ToString("n2")</dd>
+                    <dt>Tax</dt>
+                    <dd>@Model.ExigoOrder.TaxTotal.ToString("n2")</dd>
+                    <dt>Shipping</dt>
+                    <dd>@Model.ExigoOrder.ShippingTotal.ToString("n2")</dd>
+                </dl>
+                <table width="100%">
+                    <tr>
+                        <th>SKU</th>
+                        <th>Description</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                    </tr>
+                    @foreach (var item in Model.ExigoOrder.Details)
+                    {
+                        <tr>
+                            <td>
+                                @item.ItemCode
+                            </td>
+                            <td>
+                                @item.Description
+                            </td>
+                            <td>
+                                @item.Quantity.ToString("n0")
+                            </td>
+                            <td>
+                                @item.PriceEach.ToString("n2")
+                            </td>
+                        </tr>
+                    }
+                </table>
+                @if (Model.ExigoRefunds.Any())
+                {
+                    <h3>Refunds</h3>
+                    <table width="50%">
+                        <tr>
+                            <th>
+                                Id
+                            </th>
+                            <th>
+                                Amount
+                            </th>
+                        </tr>
+                        @foreach (var refund in Model.ExigoRefunds)
+                        {
+                            <tr>
+                                <td>
+                                    @refund.ExigoOrderId
+                                </td>
+                                <td>
+                                    @refund.Amount
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                }
+            </div>
+            <div class="col-xs-6">
+                <pre id="json-exigo">@Model.ExigoOrderJson</pre>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $('[data-role="display"]').on("click", function () {
+        var id = $(this).data("id");
+        $(".content-container").hide();
+        $("#" + id).show();
+    });
+    function formatJson(id) {
+        var element = $("#json-" + id);
+        var obj = JSON.parse(element.text());
+        element.html(JSON.stringify(obj, undefined, 2));
+    }
+    formatJson("shopify");
+    formatJson("exigo");
+</script>

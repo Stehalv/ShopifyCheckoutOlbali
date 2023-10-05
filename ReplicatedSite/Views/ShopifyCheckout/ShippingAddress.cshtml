@@ -1,0 +1,100 @@
+﻿@model ShopifyCheckoutViewModel
+@{
+    ViewBag.Title = Resources.Checkout.ShippingAddress_PageTitle;
+    ViewBag.PropertyBag = Model.PropertyBag;
+    var displayNew = (Model.ShippingAddresses != null && Model.ShippingAddresses.Addresses.Any()) ? "display:none;" : "";
+    var displayStored = (Model.ShippingAddresses != null && !Model.ShippingAddresses.Addresses.Any()) ? "display:none;" : "";
+
+}
+
+@if (Model.ShippingAddresses != null && Model.ShippingAddresses.Addresses.Any())
+{
+    <div id="storedAddresses" class="row" style="@displayStored">
+        @if (Model.ShippingAddresses.Addresses.Count() > 0)
+        {
+            <div class="row">
+                <div class="col-sm-12">
+                    <h3 class="pt-4">@Resources.Common.SelectShippingAddress</h3>
+                    <hr />
+                    <div class="space-10"></div>
+                    @foreach (var address in Model.ShippingAddresses.Addresses)
+                    {
+                        <div class="row">
+                            <div class="col-sm-6">
+                                @Html.DisplayFor(c => address)
+                            </div>
+
+                            <div class="col-sm-6">
+                                @using (Html.BeginForm(new { novalidate = "novalidate" }))
+                                {
+                                    using (Html.BeginHtmlFieldPrefixScope("Address"))
+                                    {
+                                        @Html.Partial("~/Views/Shared/EditorTemplates/ShippingAddressOnFile.cshtml", address)
+                                    }
+                                    <div class="space-10"></div>
+                                    <button type="submit" class="btn btn-primary float-right w-100" data-loading-text="@Resources.Common.Saving">@Resources.Checkout.ShippingAddress_SelectThisAddress</button>
+                                }
+                            </div>
+                        </div>
+                        <div class="space-10"></div>
+                        <hr />
+                    }
+                </div>
+                <div class="col-sm-12">
+                    <a class="btn btn-primary float-left" data-role="enter-new-address">@Resources.Checkout.ShippingAddress_NewAddressButton</a>
+                </div>
+            </div>
+        }
+    </div>
+}
+<div id="newAddress" style="@displayNew padding-top:10px;">
+    @using (Html.BeginForm())
+    {
+        var address = new ShippingAddress();
+        if (Model.PropertyBag.ShippingAddress.Address1.IsNotNullOrEmpty())
+        {
+            address = Model.PropertyBag.ShippingAddress;
+        }
+        else
+        {
+            address.FirstName = Model.PropertyBag.ShippingAddress.FirstName;
+            address.LastName = Model.PropertyBag.ShippingAddress.LastName;
+            address.Email = Model.PropertyBag.ShippingAddress.Email;
+            address.Phone = Model.PropertyBag.ShippingAddress.Phone;
+        }
+        <div class="section">
+            <div class="section__header">
+                <h2 class="section__title" id="main-header" tabindex="-1">
+                    @Resources.Checkout.ShippingAddress_NewAddressHeading
+                </h2>
+            </div>
+            <div class="section__content">
+                <div class="content-box">
+                    <div class="content-box__row">
+                        @Html.EditorFor(c => address, "ShippingAddress")
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button id="new-address" style="margin-top:20px;" data-role="submit_new_address" type="submit" class="btn btn-primary float-right" data-loading-text="@Resources.Common.Saving">@Resources.Checkout.ShippingAddress_ContinueButton</button>   
+    }
+</div>
+<script>
+    require(["jquery", "toastr"], function ($, toastr) {
+        var hasError = @Model.ErrorMessage.IsNotNullOrEmpty().ToString().ToLower();
+        if (hasError) {
+            toastr.error("@Model.ErrorMessage")
+        }
+        $('[data-role="enter-new-address"]').on("click", function () {
+            $("#newAddress").show();
+        });
+        $('form').on("submit", function (e) {
+            var isValid = $(this).valid();
+            if (isValid) {
+                var button = $(this).find(':submit');
+                var text = button.data("loading-text");
+                button.html(text);
+            }
+        });
+    });
+</script>

@@ -1,0 +1,73 @@
+﻿@model ReplicatedSite.Areas.Shopify.ViewModels.CustomersViewModel
+@{
+    ViewBag.Title = "Customers";
+    Layout = "~/Areas/Shopify/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row text-center" style="margin-bottom:20px;">
+    <div class="col-xs-4 text-right">
+        @if (Model.CurrentPage != 1)
+        {
+            <a href="@Url.Action("Index", "Customer", new { currentPage = Model.PreviousPage, pageSize = Model.PageSize, totalCustomers = Model.Total })"><< Previous @Model.PageSize</a>
+        }
+    </div>
+    <div class="col-xs-4 text-center">
+        <span>Showing @Model.StartRowNumber - @Model.EndRowNumber of @Model.Total</span>
+    </div>
+    <div class="col-xs-4 text-left">
+        @if (Model.CurrentPage != Model.NextPage)
+        {
+            <a href="@Url.Action("Index", "Customer", new { currentPage = Model.NextPage, pageSize = Model.PageSize, totalCustomers = Model.Total })">Next @Model.PageSize >></a>
+        }
+    </div>
+</div>
+<table width="100%">
+    <tr>
+        <th>From</th>
+        <th>Shop Customer ID</th>
+        <th>Exigo Customer </th>
+        <th>Name </th>
+        <th>Synced</th>
+        <th></th>
+    </tr>
+    @foreach (var customer in Model.Customers.OrderByDescending(c => c.CreatedDate))
+    {
+        <tr>
+            <td>
+                @Model.Tenant.Configurations.First(c => c.Id == customer.TenantConfigId).ShopUrl
+            </td>
+            <td>
+                @customer.ShopCustomerId
+            </td>
+            <td>
+                @customer.ExigoCustomerId
+            </td>
+            <td>
+                <a href="@Url.Action("CustomerDetails", "Customer", new { id = customer.Id })">@customer.CustomerName</a>
+            </td>
+            <td>
+                @customer.CreatedDate
+            </td>
+            <td>
+                <a href="@Url.Action("CustomerDetails", "Customer", new { id = customer.Id })">Detail</a>
+            </td>
+        </tr>
+    }
+</table>
+<div class="row text-center" style="margin-top:20px;">
+    <div class="col-xs-4 text-right">
+        @if (Model.CurrentPage != 1)
+        {
+            <a href="@Url.Action("Index", "Customer", new { currentPage = Model.PreviousPage, pageSize = Model.PageSize, totalCustomers = Model.Total })"><< Previous @Model.PageSize</a>
+        }
+    </div>
+    <div class="col-xs-4 text-center">
+        <span>Showing @Model.StartRowNumber - @Model.EndRowNumber of @Model.Total</span>
+    </div>
+    <div class="col-xs-4 text-left">
+        @if (Model.CurrentPage != Model.NextPage)
+        {
+            <a href="@Url.Action("Index", "Customer", new { currentPage = Model.NextPage, pageSize = Model.PageSize, totalCustomers = Model.Total })">Next @Model.PageSize >></a>
+        }
+    </div>
+</div>

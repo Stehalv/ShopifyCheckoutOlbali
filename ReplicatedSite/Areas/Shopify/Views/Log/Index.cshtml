@@ -1,0 +1,31 @@
+﻿@model List<ShopifyApp.Models.Log>
+@{
+    ViewBag.Title = "Logs";
+    Layout = "~/Areas/Shopify/Views/log/_Layout.cshtml";
+}
+
+
+<table width="100%">
+    <tr>
+        <th>Type</th>
+        <th>Message</th>
+        <th>Created</th>
+        <th></th>
+    </tr>
+    @foreach (var hook in Model.OrderByDescending(c => c.CreatedDate))
+    {
+        <tr>
+            <td>
+                @hook.LogType
+            </td>
+            <td>
+                @hook.Message
+            </td>
+            <td>
+                @hook.CreatedDate
+            </td>
+            <td>
+            </td>
+        </tr>
+    }
+</table>

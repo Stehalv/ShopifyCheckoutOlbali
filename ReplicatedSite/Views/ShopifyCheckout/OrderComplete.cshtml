@@ -1,0 +1,39 @@
+﻿@model OrderCompleteViewModel
+@{
+    ViewBag.Title = Resources.Common.OrderComplete;
+    ViewBag.PropertyBag = Model.PropertyBag;
+}
+
+<div class="section text-center">
+    @if (Model.PropertyBag.Customer != null && Model.PropertyBag.Customer.CustomerID != 0 && !Model.PropertyBag.IsEmailOnly && Model.PropertyBag.NewCustomerID == 0 && (Model.PropertyBag.Cart.OrderItems.Any() || Model.PropertyBag.Cart.AutoOrderItems.Any()))
+    {
+        if ((Model.PropertyBag.Cart.OrderItems.Any() || Model.PropertyBag.Cart.EnrollmentPackItems.Any()) && Model.Success)
+        {
+            @Html.Raw(Resources.Checkout.OrderComplete_ThankYouMessage.FormatWith(Model.PropertyBag.Cart.ShopUrl))
+        }
+        else if (Model.PropertyBag.Cart.AutoOrderItems.Any() && Model.PropertyBag.Cart.EditAutoOrderId > 0 && Model.Success)
+        {
+            @Html.Raw(Resources.Checkout.OrderComplete_AddedToAutoOrderMessage.FormatWith(Model.PropertyBag.SelectedAutoOrderId, Model.PropertyBag.Cart.ShopUrl))
+
+        }
+        else if (Model.PropertyBag.Cart.AutoOrderItems.Any() && Model.Success)
+        {
+            @Html.Raw(Resources.Checkout.OrderComplete_AutoOrderSavedMessage.FormatWith(Model.PropertyBag.Cart.EditAutoOrderId, Model.PropertyBag.Cart.ShopUrl))
+        }
+        else if (!Model.Success)
+        {
+            @Html.Raw(Resources.Checkout.OrderComplete_FailedMessage.FormatWith(Model.PropertyBag.Cart.ShopUrl))
+        }
+    }
+    else if (Model.Token.IsNotNullOrEmpty())
+    {
+        if (Model.Success)
+        {
+            @Html.Raw(Resources.Checkout.OrderComplete_RegistrationCompletedMessage.FormatWith(Model.PropertyBag.Cart.ShopUrl))
+        }
+        else
+        {
+            @Html.Raw(Resources.Checkout.OrderComplete_FailedMessageToken.FormatWith(Model.PropertyBag.Cart.ShopUrl))
+        }
+    }
+</div>

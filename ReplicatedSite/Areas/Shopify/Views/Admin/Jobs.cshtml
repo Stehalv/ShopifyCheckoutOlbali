@@ -1,0 +1,39 @@
+﻿@using ReplicatedSite;
+@model ShopifyApp.Models.Tenant
+@{
+    ViewBag.Title = "Admin-Jobs";
+    Layout = "~/Areas/Shopify/Views/Admin/_Layout.cshtml";
+}
+<div>
+    <h3>Jobs</h3><br />
+    <a href="@Url.Action("StartJobs", "Admin")">Start Jobs </a><br/>
+    <table width="50%" style="margin-top:25px;" ">
+        <tr>
+            <th>
+                Key
+            </th>
+            <th>
+                Group
+            </th>
+            <th>
+                Running
+            </th>
+            <th>
+                Actions
+            </th>
+        </tr>
+        @foreach (var job in ShopifyApp.Settings.Jobs)
+        {
+            <tr>
+                <td>@job.Name</td>
+                <td>@job.Group</td>
+                <td>
+                    @job.CheckJobStatus().ToString()
+                </td>
+                <td>
+                    <a href="@Url.Action("RunJob", "Admin", new { name = job.Name })">Process </a>
+                </td>
+            </tr>
+        }
+    </table>
+</div>

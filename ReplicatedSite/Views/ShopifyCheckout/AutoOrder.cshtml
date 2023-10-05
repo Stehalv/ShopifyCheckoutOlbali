@@ -1,0 +1,250 @@
+﻿@model ShopifyCheckoutViewModel
+@{
+    ViewBag.Title = Resources.Checkout.AutoOrder_PageTitle;
+    ViewBag.PropertyBag = Model.PropertyBag;
+    var minimumStartDate = GlobalUtilities.GetNextAvailableAutoOrderStartDate(DateTime.Now.ToCST());
+    var currentMarket = Utilities.GetCurrentMarket();
+    var availableFrequencyTypes = currentMarket.AvailableAutoOrderFrequencyTypes;
+
+}
+@using (Html.BeginForm())
+{
+    var contextID = Guid.NewGuid().ToString();
+    var market = GlobalUtilities.GetCurrentMarket(this.Context);
+    var defaultCountryCode = market.MainCountry;
+    var defaultRegionCode = "";
+    var newIsChecked = Model.PropertyBag.SelectedAutoOrderId == 0 ? "checked=checked" : "";
+    var newDisplay = Model.PropertyBag.SelectedAutoOrderId == 0 ? "" : "display:none";
+    var displayAddress = (Model.PropertyBag.AutoOrderAddressSameAsShipping) ? "display:none" : "";
+    <div class="section section--autoOrder" style="margin-top:25px">
+        <div class="section__header">
+            <h2 class="section__title" id="main-header" tabindex="-1">
+                @Resources.Checkout.AutoOrder_Heading
+            </h2>
+        </div>
+        <div class="section__content">
+
+            @if (Model.PropertyBag.Cart.EditAutoOrderId > 0)
+            {
+                <div class="field field--show-floating-label">
+                    <div class="field__input-wrapper">
+                        <label class="field__label field__label--visible">@Resources.Checkout.AutoOrder_HowOftenDoYouWantToRecieve</label>
+                        @Html.DropDownListFor(c => c.PropertyBag.AutoOrderFrequencyType, availableFrequencyTypes.Select(c => new SelectListItem()
+                        {
+                            Value = ((int)c).ToString(),
+                            Text = CommonResources.FrequencyTypes(ExigoDAL.GetFrequencyTypeID(c))
+                        }), new { @class = "field__input field__input--select" })
+                    </div>
+                </div>
+                <div class="field field--half field--show-floating-label">
+                    <div class="field__input-wrapper">
+                        <div class="input-group">
+                            <label class="field__label field__label--visible">@Resources.Checkout.AutoOrder_StartingOn</label>
+                            <input type="text" id="Date" class="field__input date" value="@Model.PropertyBag.AutoOrderStartDate.ToString("M/d/yyyy")" />
+                            <div id="triggerDatePicker" class="input-group-append cursor-pointer">
+                                <span class="input-group-text">
+                                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <input type="hidden" id="@Html.IdFor(c => c.PropertyBag.AutoOrderStartDate)" name="@Html.NameFor(c => c.PropertyBag.AutoOrderStartDate)" value="@Model.PropertyBag.AutoOrderStartDate.ToString("M/d/yyyy")" />
+                    </div>
+                </div>
+                <div class="section" id="autoorder-address" style="clear:both">
+                    <div class="section__header">
+                        <h2 class="section__title" id="main-header" tabindex="-1">
+                            @Resources.Checkout.AutoOrder_AutoOrderShippingAddress
+                        </h2>
+                    </div>
+                    <div class="section__content">
+                        <div class="content-box">
+                            <div class="content-box__row">
+                                @Html.EditorFor(c => Model.PropertyBag.AutoOrderShippingAddress, "ShippingAddress")
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                if (Model.PropertyBag.ExisitingAutoOrder)
+                {
+                    foreach (var order in Model.CustomerAutoOrders)
+                    {
+                        var selected = Model.PropertyBag.SelectedAutoOrderId == order.AutoOrderID ? "checked=checked" : "";
+                        @Html.HiddenFor(c => c.PropertyBag.AddToExistingAutoOrder)
+                        @Html.HiddenFor(c => c.PropertyBag.SelectedAutoOrderId)
+                        <div class="content-box">
+                            <div class="content-box__row">
+                                <div class="radio-wrapper">
+                                    <div class="radio__input">
+                                        <input class="input-radio" type="radio" value="@order.AutoOrderID" @selected name="autoOrderType" id="autoOrderType">
+                                    </div>
+                                    <label class="radio__label">
+                                        <span class="radio__label__primary">
+                                            @Resources.Checkout.AutoOrder_AddToExisitingAutoOrder.FormatWith(order.FrequencyTypeDescription)
+                                        </span>
+                                        <span class="radio__label__accessory">
+                                            @Resources.Checkout.AutoOrder_NextRunDate @order.NextRunDate.Value.ToShortDateString()
+                                        </span>
+                                    </label>
+                                </div> <!-- /radio-wrapper-->
+                            </div>
+                        </div>
+                    }
+
+                }
+                <div class="content-box">
+                    <div class="content-box__row">
+                        <div class="radio-wrapper">
+                            <div class="radio__input">
+                                <input class="input-radio" type="radio" value="new" @newIsChecked name="autoOrderType" id="autoOrderType">
+                            </div>
+                            <label class="radio__label">
+                                <span class="radio__label__primary">
+                                    @Resources.Checkout.AutoOrder_CreateNewAutoOrder
+                                </span>
+                                <span class="radio__label__accessory">
+                                </span>
+                            </label>
+                        </div> <!-- /radio-wrapper-->
+                    </div>
+                </div>
+                <div id="newautoorder-container" class="payment-radio radio-wrapper content-box__row content-box__row--secondary card-fields-container card-fields-container--loaded card-fields-container--transitioned" style="@newDisplay">
+                    <div class="field field--show-floating-label">
+                        <div class="field__input-wrapper">
+                            <label class="field__label field__label--visible">@Resources.Checkout.AutoOrder_HowOftenDoYouWantToRecieve</label>
+                            @Html.DropDownListFor(c => c.PropertyBag.AutoOrderFrequencyType, availableFrequencyTypes.Select(c => new SelectListItem()
+                            {
+                                Value = ((int)c).ToString(),
+                                Text = CommonResources.FrequencyTypes(ExigoDAL.GetFrequencyTypeID(c))
+                            }), new { @class = "field__input field__input--select" })
+                        </div>
+                    </div>
+                    <div class="field field--half field--show-floating-label">
+                        <div class="field__input-wrapper">
+                            <div class="input-group">
+                                <label class="field__label field__label--visible">@Resources.Checkout.AutoOrder_StartingOn</label>
+                                <input type="text" id="Date" class="field__input date" value="@Model.PropertyBag.AutoOrderStartDate.ToString("M/d/yyyy")" />
+                                <div id="triggerDatePicker" class="input-group-append cursor-pointer">
+                                    <span class="input-group-text">
+                                        <i class="fa fa-calendar" aria-hidden="true"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <input type="hidden" id="@Html.IdFor(c => c.PropertyBag.AutoOrderStartDate)" name="@Html.NameFor(c => c.PropertyBag.AutoOrderStartDate)" value="@Model.PropertyBag.AutoOrderStartDate.ToString("M/d/yyyy")" />
+                        </div>
+                    </div>
+                    <div class="checkbox-wrapper">
+                        <div class="checkout-buyer-accepts-marketing-wrapper">
+                            <div class="checkbox__input">
+                                @Html.CheckBoxFor(c => c.PropertyBag.AutoOrderAddressSameAsShipping, new { @class = "input-checkbox" })
+                            </div>
+                            <label class="checkbox__label">
+                                @Resources.Checkout.AutoOrder_AddressSameAsShipping
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section" id="autoorder-address" style=" clear: both; @displayAddress">
+                    <div class="section__header">
+                        <h2 class="section__title" id="main-header" tabindex="-1">
+                            @Resources.Checkout.AutoOrder_AutoOrderShippingAddress
+                        </h2>
+                    </div>
+                    <div class="section__content">
+                        <div class="content-box">
+                            <div class="content-box__row">
+                                @Html.EditorFor(c => Model.PropertyBag.AutoOrderShippingAddress, "ShippingAddress")
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary align-self-end float-right" style="margin-top:20px">@Resources.Checkout.AutoOrder_Continue</button>
+}
+
+<script>
+    require(["jquery", "toastr", "moment", "jquery-ui", "timepicker"], function ($, toastr, moment) {
+
+        // Settings
+        var context = "#view-autoordersettings",
+            $context = $(context),
+            $Date = $("#Date"),
+            $triggerDatePicker = $("#triggerDatePicker"),
+            $AutoOrderStartDate = $("#" + "@Html.IdFor(c => c.PropertyBag.AutoOrderStartDate)");
+
+
+        // Event Handlers
+        function registerEventHandlers() {
+
+            $('input[type=radio][name="autoOrderType"]').change(function () {
+                var value = $(this).val();
+                console.log(value);
+                if (value == "new") {
+                    $("#newautoorder-container").show();
+                    $("#PropertyBag_AddToExistingAutoOrder").val(false)
+                } else {
+                    $("#newautoorder-container").hide();
+                    $("#PropertyBag_AddToExistingAutoOrder").val(true)
+                    $("#PropertyBag_SelectedAutoOrderId").val(value)
+                }
+            });
+            var error = @Model.ErrorMessage.IsNotNullOrEmpty().ToString().ToLower();
+            if (error) {
+                toastr.error("@Model.ErrorMessage")
+            }
+            $('form').on("submit", function (e) {
+                var isValid = $(this).valid();
+                if (isValid) {
+                    var button = $(this).find(':submit');
+                    var text = button.data("loading-text");
+                    button.html(text);
+                }
+            });
+            $("#PropertyBag_AutoOrderAddressSameAsShipping").change(function () {
+                $("#autoorder-address").toggle();
+            })
+            $Date.on("change", function () {
+                SetAutoOrderStartDate();
+            });
+
+            $triggerDatePicker.on('click', function(){
+                $Date.datepicker('show');
+            });
+
+        }
+
+        function SetAutoOrderStartDate() {
+            let DateTime = moment($Date.val());
+
+            $AutoOrderStartDate.val(DateTime.format());
+        }
+
+        // Initialization
+        function init() {
+            var today = new Date();
+
+	        $Date.datepicker({
+		        'format': 'M/d/yyyy',
+                'autoclose': true,
+                beforeShowDay: function (date) {
+                    var day = date.getUTCDate();
+                    return [($.inArray(day, [28,29,30,31]) == -1)];
+                },
+                startDate: '+30d',
+                minDate: today,
+                maxDate: '+60d'
+            });
+
+            SetAutoOrderStartDate();
+
+            registerEventHandlers();
+        }
+
+        init();
+    });
+</script>

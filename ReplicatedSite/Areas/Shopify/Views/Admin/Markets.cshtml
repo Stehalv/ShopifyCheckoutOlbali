@@ -1,0 +1,38 @@
+﻿@using ReplicatedSite;
+@model ShopifyApp.Models.Tenant
+@{
+    ViewBag.Title = "Admin-Markets";
+    Layout = "~/Areas/Shopify/Views/Admin/_Layout.cshtml";
+}
+<div>
+    <h3>Markets</h3>
+    <table width="50%" style="margin-top:25px;">
+        <tr>
+            <th>
+                Country
+            </th>
+            <th>
+                Currency
+            </th>
+            <th>
+
+            </th>
+        </tr>
+        @if (Model.OrderConfigurations != null)
+        {
+            foreach (var config in Model.OrderConfigurations)
+            {
+                <tr>
+                    <td>@config.DefaultCountryCode</td>
+                    <td>@config.CurrencyCode</td>
+                    <td>
+                        @if (ShopifyApp.Settings.IsAdmin(Identity.Current.UserRole))
+                        {
+                            <a href="@Url.Action("Edit", "TenantOrderConfigurations", new { id = config.Id })">Edit</a>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+    </table>
+</div>

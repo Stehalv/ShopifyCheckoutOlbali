@@ -1,0 +1,60 @@
+﻿@using ReplicatedSite;
+@model ReplicatedSite.Areas.Shopify.ViewModels.TenantConfigurationViewModel
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Areas/Shopify/Views/TenantConfigurations/_Layout.cshtml";
+}
+
+<h2>Webhooks</h2>
+
+@foreach (var config in Model.Webhooks.ConfigWebhooks)
+{
+    <table width="100%">
+        <tr>
+            <th>Topic</th>
+            <th>Url</th>
+            <th>Created</th>
+            <th></th>
+        </tr>
+        @foreach (var hook in config.Webhooks)
+        {
+            <tr>
+                <td>
+                    @hook.Topic
+                </td>
+                <td>
+                    @hook.Address
+                </td>
+                <td>
+                    @hook.CreatedDate
+                </td>
+                <td>
+                    <a href="@Url.Action("Webhookdetails", "Webhook", new { id = hook.Id, tenantConfigId = config.TenantConfigId })">Details</a>/
+                    <a href="@Url.Action("DeleteWebhook", "Webhook", new { id = hook.Id, tenantConfigId = config.TenantConfigId  })">Delete</a>
+                </td>
+            </tr>
+        }
+        @foreach (var availableHook in Model.Webhooks.AvailableWebhooks)
+        {
+            if (!config.Webhooks.Where(c => c.Topic == availableHook.Topic).Any())
+            {
+                <tr>
+                    <td>
+                    </td>
+                    <td>
+                        @availableHook.Topic
+                    </td>
+                    <td>
+                        <a href="@Url.Action("CreateWebhook", "Webhook", new { topic = availableHook.Topic, tenantConfigId = config.TenantConfigId })">Add</a>
+                    </td>
+                    <td>
+                    </td>
+                    <td>
+                    </td>
+                </tr>
+            }
+        }
+
+    </table>
+}

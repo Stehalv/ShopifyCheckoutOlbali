@@ -1,0 +1,131 @@
+﻿@model ShippingAddress
+@{
+    var contextID = Guid.NewGuid().ToString();
+    var market = GlobalUtilities.GetCurrentMarket(this.Context);
+    var defaultCountryCode = market.MainCountry;
+    var defaultRegionCode = "";
+    var countrySelectList = Html.Countries(defaultCountryCode);
+}
+
+
+<div class="field field--half field--show-floating-label">
+    <div class="field__input-wrapper">
+        <label class="field__label field__label--visible">@Resources.Checkout.FirstName</label>
+        @Html.TextBoxFor(c => Model.FirstName, new { @placeholder = Resources.Checkout.FirstName, @class = "field__input" })
+        @Html.ValidationMessageFor(c => Model.FirstName)
+    </div>
+</div>
+<div class="field field--half field--show-floating-label">
+    <div class="field__input-wrapper">
+        <label class="field__label field__label--visible">@Resources.Checkout.LastName</label>
+        @Html.TextBoxFor(c => Model.LastName, new { @placeholder = Resources.Checkout.LastName, @class = "field__input" })
+        @Html.ValidationMessageFor(c => Model.LastName)
+    </div>
+</div>
+<div class="field field--show-floating-label">
+    <div class="field__input-wrapper">
+        <label class="field__label field__label--visible">@Resources.Checkout.Email</label>
+        @Html.TextBoxFor(c => Model.Email, new { @placeholder = Resources.Checkout.Email, @class = "field__input" })
+        @Html.ValidationMessageFor(c => Model.Email)
+    </div>
+</div>
+<div class="field field--show-floating-label">
+    <div class="field__input-wrapper">
+        <label class="field__label field__label--visible">@Resources.Checkout.Phone</label>
+        @Html.TextBoxFor(c => Model.Phone, new { @placeholder = Resources.Checkout.Phone, @class = "field__input phone" })
+        @Html.ValidationMessageFor(c => Model.Phone)
+    </div>
+</div>
+<div class="field field--show-floating-label">
+    <div class="field__input-wrapper field__input-wrapper--select">
+        <label class="field__label field__label--visible">@Resources.Checkout.Country</label>
+        @Html.DropDownListFor(c => Model.Country,
+            selectList: countrySelectList,
+            htmlAttributes: new
+            {
+                @class = "field__input field__input--select",
+                data_region_bind = "#" + Html.IdFor(c => Model.State) + "_" + contextID,
+                data_address_bind = "#" + Html.IdFor(c => Model.Address2) + "_" + contextID,
+                data_role = "Country",
+                placeholder = Resources.Checkout.Country
+            })
+        @Html.ValidationMessageFor(c => Model.Country)
+    </div>
+</div>
+<div class="field field--show-floating-label">
+    <div class="field__input-wrapper">
+        <label class="field__label field__label--visible">@Resources.Checkout.StreetAddress</label>
+        @Html.TextBoxFor(c => Model.Address1, new { @placeholder = Resources.Checkout.StreetAddress, @class = "field__input" })
+        @Html.ValidationMessageFor(c => Model.Address1)
+    </div>
+</div>
+
+<div class="field field--show-floating-label">
+    <div class="field__input-wrapper">
+        <label class="field__label field__label--visible">@Resources.Checkout.Address2</label>
+        @Html.TextBoxFor(c => Model.Address2, new { @placeholder = Resources.Checkout.Address2, @class = "field__input" })
+        @Html.ValidationMessageFor(c => Model.Address2)
+    </div>
+</div>
+
+<div class="field field--show-floating-label" id="state-selector" @if (defaultCountryCode != "US") { <text> style="display: none;" </text> }>
+    <div class="field__input-wrapper field__input-wrapper--select">
+        <label class="field__label field__label--visible">@Resources.Checkout.State</label>
+        @Html.DropDownListFor(c => Model.State,
+            selectList: Html.Regions(defaultCountryCode, defaultRegionCode),
+            htmlAttributes: new
+            {
+                @class = "field__input field__input--select",
+                data_region_bind = "#" + Html.IdFor(c => Model.State) + "_" + contextID,
+                data_address_bind = "#" + Html.IdFor(c => Model.Address2) + "_" + contextID,
+                data_role = "Country",
+                placeholder = Resources.Checkout.State
+            })
+        @Html.ValidationMessageFor(c => Model.State)
+    </div>
+</div>
+<div class="field field--half field--show-floating-label">
+    <div class="field__input-wrapper">
+        <label class="field__label field__label--visible">@Resources.Checkout.City</label>
+        @Html.TextBoxFor(c => Model.City, new { @placeholder = Resources.Checkout.City, @class = "field__input" })
+        @Html.ValidationMessageFor(c => Model.City)
+    </div>
+</div>
+<div class="field field--half field--show-floating-label">
+    <div class="field__input-wrapper">
+        <label class="field__label field__label--visible">@Resources.Checkout.Zip</label>
+        @Html.TextBoxFor(c => Model.Zip, new { @placeholder = Resources.Checkout.Zip, @class = "field__input" })
+        @Html.ValidationMessageFor(c => Model.Zip)
+    </div>
+</div>
+<script>
+    require(["jquery", 'mask'], function ($, mask) {
+        $('.phone').mask('@market.PhoneMask');
+        $("#address_Country").on("change", function () {
+            var val = $(this).val();
+            actions.populateStatesDropdown(val);
+        })
+
+        var actions = {
+            populateStatesDropdown: function (country) {
+                $.ajax({
+                    url: '@Url.Action("GetRegions", "App")',
+                    data: { id: country },
+                    success: function (response) {
+                        if (response.regions.length == 0) {
+                            $("#state-selector").hide();
+                        } else {
+                            $("#state-selector").show();
+                            var html = "";
+                            for (let i = 0; i < response.regions.length; i++) {
+                                var r = response.regions[i];
+                                html += '<option value="' + r.RegionCode + '">' + r.RegionName + '</option>';
+                            }
+                            $('#address_State').html(html);
+                        }
+                    }
+                })
+            }
+        }
+    });
+</script>

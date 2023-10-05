@@ -1,0 +1,79 @@
+﻿@using ReplicatedSite;
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - SHopifyApp</title>
+    @Styles.Render("~/Areas/Shopify/Content/css")
+    @Scripts.Render("~/Areas/Shopify/bundles/modernizr")
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+    <script src="~/Areas/Shopify/Content/Scripts/ReferralTracking.js?v=1" type="text/javascript"></script>
+</head>
+<body>
+    <style>
+        .body-content{
+            margin-top:60px;
+        }
+    </style>
+    <div class="navbar navbar-inverse navbar-fixed-top" >
+        <div class="container-fluid" style="margin:0px 20px">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("E-commerce App", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
+                    <li>@Html.ActionLink("Customers", "Index", "Customer")</li>
+                    <li>@Html.ActionLink("Orders", "Index", "Order")</li>
+                    <li>@Html.ActionLink("Log", "Index", "Log")</li>
+                    @if (ShopifyApp.Settings.IsAdmin(Identity.Current.UserRole))
+                    {
+                        <li>@Html.ActionLink("Users", "Index", "Users")</li>
+                    }
+                    @if (ShopifyApp.Settings.IsSystemAdmin(Identity.Current.UserRole))
+                    {
+                        <li>@Html.ActionLink("Admin", "Index", "Admin")</li>
+                    }
+                </ul>
+                <div class="nav navbar-nav navbar-right">
+                    <li><a href="#"><span class="glyphicon glyphicon-user"></span> @Identity.Current.FirstName (@Identity.Current.UserRole.ToString())</a></li>
+                    <li><a href="@Url.Action("Logout", "Home")"><span class="glyphicon glyphicon-log-in"></span> Sign Out</a></li>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid body-content">
+        @RenderBody()
+    </div>
+    <footer style="width:100%; bottom:25px; text-align:center">
+        <hr />
+        <p>&copy; @DateTime.Now.Year - Teqnavi</p>
+    </footer>
+    @Scripts.Render("~/areas/shopify/bundles/jquery")
+    @Scripts.Render("~/areas/shopify/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+    <script>
+        function setTenantCookie(value) {
+            if (value != null) {
+                var expires = "";
+                var date = new Date();
+                date.setTime(date.getTime() + (30 * 24 * 60 * 60 * 1000));
+                expires = "; expires=" + date.toUTCString();
+                document.cookie = "tenantId" + "=" + value + expires + "; path=/";
+            }
+        }
+        $("#tenantselector").on("change", function () {
+            setTenantCookie($(this).val());
+            window.location = '@Url.Action("Index", "Home")';
+        })
+    </script>
+</body>
+</html>

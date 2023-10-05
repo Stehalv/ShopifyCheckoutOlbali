@@ -1,0 +1,233 @@
+﻿@model ShopifyCheckoutViewModel
+<link href="~/Content/styles/citcon.css" rel="stylesheet" />
+
+<script type="text/javascript">
+    var paymentMethod = 'braintree'; 
+    let paymentMethodArray = [ 'paypal', 'venmo'];
+    let defaultPaymentMethod = 'paypal';
+    let selectedPaymentMethod = 'paypal';
+    var merchantKey = 'sk-prod-936239a76c2b82adb656aa3529a04387';
+    var citconDropins = ['AllInOne', 'Municipal', 'Phone', 'Email', 'DocumentID', 'Address'];
+</script>
+<div id="citcon-client-container">
+
+</div>
+
+<script src="https://cdn.citconpay.com/latest/core/citconpay.core.js"></script>
+
+
+<script type="text/javascript">
+    require(["jquery", 'mask'], function ($, mask) {
+        'use strict';
+
+        let transaction_reference = create_reference(20);
+        let sdkEnv = 'prod';
+        let merchantUrl = "https://api.citconpay.com/v1";
+        let access_token = null;
+        let citconInstance = null;
+        let transactionId = null;
+        let chargeToken = null;
+
+        $(document).ready(function () {
+
+
+
+
+            //Step 1: Get Access Token and Charge Token from server
+            let apiUrl = merchantUrl;
+            var data = JSON.stringify({
+                "token_type": "client"
+            });
+            $.ajax({
+                url: apiUrl + "/access-tokens",
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": "Bearer " + merchantKey,
+                    "Content-Type": "application/json" },
+                type: 'post',
+                dataType: 'json',
+                data: data,
+                success: function (resp) {
+                    if (resp.status === 'success') {
+                        access_token = resp.data.access_token;
+                    } else {
+                        console.log(resp.data);
+                    }
+                },
+                async: false
+            });
+            var chargeReq = JSON.stringify({
+                transaction: {
+                reference: transaction_reference,
+                amount: @Convert.ToInt32(Model.PropertyBag.Cart.OrderTotal * 100),
+                currency: "USD",
+                auto_capture: false,
+                country: "US",
+                urls: {
+
+                    ipn_url: "@GlobalSettings.ReplicatedSites.FormattedBaseUrl.FormatWith(Identity.Owner.WebAlias)/shopifycheckout/citconIpn",
+                    success_url: "@GlobalSettings.ReplicatedSites.FormattedBaseUrl.FormatWith(Identity.Owner.WebAlias)/shopifycheckout/ordercomplete?success=true",
+                    fail_url: "@GlobalSettings.ReplicatedSites.FormattedBaseUrl.FormatWith(Identity.Owner.WebAlias)/shopifycheckout/ordercomplete?success=false",
+                    mobile_url: "@GlobalSettings.ReplicatedSites.FormattedBaseUrl.FormatWith(Identity.Owner.WebAlias)/shopifycheckout/ordercomplete?success=true"
+                    }
+                }
+            });
+            $.ajax({
+                url: apiUrl + "/charges",
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": "Bearer " + access_token,
+                    "Content-Type": "application/json"  },
+                type: 'post',
+                dataType: 'json',
+                data: chargeReq,
+                success: function (resp) {
+                    console.log('create pending transaction...' + JSON.stringify(resp));
+                    if (resp.status === 'success') {
+                        chargeToken = resp.data.charge_token;
+                        transactionId = resp.data.id;
+                    } else {
+                        console.log(resp.data);
+                    }
+                },
+                async: false
+            });
+
+            //init sdk
+            const configObj = {
+                accessToken: access_token,
+                environment: sdkEnv,
+                debug: true,
+                consumerID: "1",
+                cardTypes: ['VISA', 'MA', 'AXP', 'DFS', 'JCB', 'Diners', 'Hiper', 'Banamex', 'Banorte', 'Bbva', 'HSBC', 'Santander', 'CARNET'],
+                threeDSPaymentMethodScope: ['debitcard'], // debitcard,creditcard,
+                availableCountries: ['US'],
+                countryCode: "US",
+                urls: {
+
+                    ipn: "@GlobalSettings.ReplicatedSites.FormattedBaseUrl.FormatWith(Identity.Owner.WebAlias)/shopifycheckout/citconIpn",
+                    success: "@GlobalSettings.ReplicatedSites.FormattedBaseUrl.FormatWith(Identity.Owner.WebAlias)/shopifycheckout/ordercomplete?success=true",
+                    cancel: "@GlobalSettings.ReplicatedSites.FormattedBaseUrl.FormatWith(Identity.Owner.WebAlias)/shopifycheckout/ordercomplete?success=false",
+                    fail: "@GlobalSettings.ReplicatedSites.FormattedBaseUrl.FormatWith(Identity.Owner.WebAlias)/shopifycheckout/ordercomplete?success=false",
+                    mobile: "@GlobalSettings.ReplicatedSites.FormattedBaseUrl.FormatWith(Identity.Owner.WebAlias)/shopifycheckout/ordercomplete?success=true"
+                }
+            };
+            citconpay.client.core(configObj).then(clientInstance => {
+                // mount UI
+                citconInstance = clientInstance;
+
+                clientInstance.mount('#citcon-client-container', {
+                    classname: 'payment-method-select-component',
+                    paymentMethods: paymentMethodArray,
+                    //selectedPaymentMethod: defaultPaymentMethod,
+                    citconDropinFormDetail: citconDropins,
+                }, sdkUIDidInitialized).then(function (instance) {
+
+                    console.log('instance ...' + JSON.stringify(instance));
+                    console.log('dropin ...' + JSON.stringify(instance.dropIn));
+                    //.....
+                    registerEvents();
+                }).catch(error => {
+                    console.log(' mount error:' + JSON.stringify(error));
+                });
+            }).catch(error => {
+                console.log(' Init SDK error:' + JSON.stringify(error));
+            });
+            function mountWidgets() {
+
+                citconpay.dropin.dropIn.mount("#firstName", citconInstance, {
+                    citconDropinFormDetail: ['FirstName'],
+                });
+            }
+            function sdkUIDidInitialized(e) {
+
+            }
+            function registerEvents() {
+                citconInstance.on('payment-method-selected', function (e) {
+                    $(".input-radio").prop("checked", false);
+                    $("#PlaceOrderButton").hide();
+                })
+                $('input[type=radio][name=PaymentMethod]').on("change", function () {
+                    $("#paypal-radio").prop("checked", false);
+                    $("#venmo-radio").prop("checked", false);
+                    $("#PlaceOrderButton").show();
+                });
+                // This event is triggered when consumer clicks the “Pay Now” button
+                citconInstance.on('payment-method-submitted', function (e) {
+                    $("#place-order-modal").modal('show');
+                    selectedPaymentMethod = e.paymentMethod;
+                    let requestOptions = {};
+                    $.ajax({
+                        url: '@Url.Action("GetSDKRequestObject")',
+                        data: { citconType: e.paymentMethod, transactionReference: transaction_reference, chargeToken: chargeToken },
+                        type: "POST",
+                        success: function (response) {
+                            if (response.success) {
+                                requestOptions = response.sdkRequest;
+
+                                citconInstance.onPaymentMethodSubmitted(e.paymentMethod, requestOptions).then(rest => {
+                                }).catch(error => {
+                                    $("#place-order-modal").modal('hide');
+                                    console.log(error);
+                                    toastr.error(response.message);
+                                })
+                            } else {
+                                $("#place-order-modal").modal('hide');
+                                toastr.error(response.message)
+                            }
+                        }
+                    });
+                })
+                // This event is triggered when payment is completed. It calls back the listener with payment result.
+                citconInstance.on('payment-status-changed', function (e) {
+                    if (e.status == "success") {
+                        console.log(e);
+                        $.ajax({
+                            url: '@Url.Action("SubmitCheckout")',
+                            data: { isCitconWebSDK: true, authorizationCode: e.data.reference, sdkPaymentMethod: selectedPaymentMethod },
+                            type: "POST",
+                            success: function (response) {
+                                if (response.success) {
+                                    window.location = "/@Identity.Owner.WebAlias/shopifycheckout/ordercomplete?success=true";
+                                } else {
+                                    $("#place-order-modal").modal('hide');
+                                    toastr.error(response.message)
+                                }
+                            }
+                        });
+                    } else {
+                        $("#place-order-modal").modal('hide');
+                        toastr.error("Payment failed");
+                    }
+                });
+            }
+        });
+
+
+        function create_reference(length) {
+            let result = '';
+            let characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+            let charactersLength = characters.length;
+            for (let i = 0; i < length; i++) {
+                result += characters.charAt(Math.floor(Math.random() * charactersLength));
+            }
+            $("#transactionReference").html('Transaction Reference:' + result);
+            return result;
+        }
+
+
+        (function () {
+            'use strict';
+
+            // Validate form on window.load
+            window.addEventListener('load', function () {
+                [...document.getElementsByTagName('form')].map(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }, false);
+                });
+            }, false);
+        })();
+    });
+</script>

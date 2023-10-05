@@ -1,0 +1,80 @@
+﻿@model ShopifyCheckoutViewModel
+@{
+    ViewBag.Title = Resources.Checkout.EnrollmentInfo_PageTitle;
+    ViewBag.PropertyBag = Model.PropertyBag;
+
+}
+<style>
+    .main .input-checkbox, .main .input-radio {
+        border-color: black !important;
+        background-color: #fff;
+    }
+</style>
+@using (Html.BeginForm())
+{
+    <div class="section" style="margin-top:20px">
+        <div class="section__header">
+            <div class="layout-flex layout-flex--tight-vertical layout-flex--loose-horizontal layout-flex--wrap">
+                <h2 class="section__title layout-flex__item layout-flex__item--stretch">
+                    @Resources.Checkout.EnrollmentInfo_SectionHeader
+                </h2>
+            </div>
+        </div>
+        <div class="section__content">
+            <div class="field field--show-floating-label">
+                <div class="field__input-wrapper">
+                    @Html.LabelFor(c => Model.PropertyBag.Customer.NewLoginName, new { @class = "field__label field__label--visible" })
+                    @Html.TextBoxFor(c => Model.PropertyBag.Customer.NewLoginName, new { @placeholder = Resources.Checkout.EnrollmentInfo_LoginName, @class = "field__input" })
+                    @Html.ValidationMessageFor(c => Model.PropertyBag.Customer.NewLoginName)
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section" style="margin-top:20px">
+        <div class="section__header">
+            <div class="layout-flex layout-flex--tight-vertical layout-flex--loose-horizontal layout-flex--wrap">
+                <h2 class="section__title layout-flex__item layout-flex__item--stretch">
+                    @Resources.Checkout.EnrollmentInfo_TermsAndConditionsHeader
+                </h2>
+            </div>
+        </div>
+        <div class="section__content">
+            @Html.Raw(Resources.Checkout.EnrollmentInfo_TermsAndConditionsHtml.FormatWith(Model.PropertyBag.Cart.ShopUrl))
+            <div class="checkbox-wrapper">
+                <div class="checkout-buyer-accepts-marketing-wrapper">
+                    <div class="checkbox__input">
+                        @Html.CheckBoxFor(c => c.PropertyBag.AcceptedTerms, new { @class = "input-checkbox" })
+                    </div>
+                    <label class="checkbox__label">
+                        @Html.Raw(Resources.Checkout.EnrollmentInfo_PoliciesCheckboxText)
+                        
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button id="enrollmentContinue" style="margin-top:20px;" type="submit" class="btn btn-primary float-right" data-loading-text="@Resources.Common.Saving">@Resources.Checkout.EnrollmentInfo_ContinueButton</button>
+}
+<script>
+    require(["jquery", "toastr"], function ($, toastr) {
+        var hasError = @Model.ErrorMessage.IsNotNullOrEmpty().ToString().ToLower();
+        if (hasError) {
+            toastr.error("@Model.ErrorMessage")
+        }
+        $('form').on("submit", function (e) {
+            var isValid = $(this).valid();
+            if (isValid) {
+                var button = $(this).find(':submit');
+                var text = button.data("loading-text");
+                button.html(text);
+            }
+
+        });
+        $("#newWebalias").html('@Model.PropertyBag.Customer.NewLoginName');
+        $('#PropertyBag_Customer_NewLoginName').on("keyup", function () {
+            $("#newWebalias").html($(this).val());
+        });
+    });
+</script>
+

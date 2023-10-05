@@ -1,0 +1,113 @@
+﻿@model ShopifyApp.Models.TenantConfiguration
+
+@{
+    ViewBag.Title = "Delete";
+    Layout = "~/Areas/Shopify/Views/TenantConfigurations/_Layout.cshtml";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>TenantConfiguration</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.TenantId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TenantId)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ExigoReportingDBConnectionString)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ExigoReportingDBConnectionString)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ExigoCompanyKey)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ExigoCompanyKey)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ExigoApiKey)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ExigoApiKey)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ExigoApiSecret)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ExigoApiSecret)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.UseSandbox)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.UseSandbox)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.SandBoxId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.SandBoxId)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ShopifySecret)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ShopifySecret)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ShopifyShopUrl)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ShopifyShopUrl)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DefaultEnrollerID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DefaultEnrollerID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DefaultEnrollerWebAlias)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DefaultEnrollerWebAlias)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn btn-default" /> |
+            @Html.ActionLink("Back to List", "Index")
+        </div>
+    }
+</div>

@@ -1,0 +1,33 @@
+﻿@using ReplicatedSite;
+@model ShopifyApp.Models.Tenant
+@{
+    ViewBag.Title = "Admin-Settings";
+    Layout = "~/Areas/Shopify/Views/Admin/_Layout.cshtml";
+}
+<div>
+    <h3>Settings</h3>
+    <dl class="dl-horizontal">
+        <dt>Company:</dt>
+        <dd>
+            @ShopifyApp.Settings.CompanyName
+        </dd>
+        <dt>Api Login:</dt>
+        <dd>
+            @if (Model.ExigoApiKey.IsNotNullOrEmpty())
+            {
+                <span>**********</span>
+            }
+        </dd>
+        <dt>Api Secret:</dt>
+        <dd>
+            @if (Model.ExigoApiSecret.IsNotNullOrEmpty())
+            {
+                <span>**********</span>
+            }
+        </dd>
+        <dt>Api Company Key:</dt>
+        <dd>
+            @Model.ExigoCompanyKey
+        </dd>
+    </dl>
+</div>

@@ -1,0 +1,558 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AccountModal_ActivateAccount" xml:space="preserve">
+    <value>Activate Shop Account</value>
+  </data>
+  <data name="AccountModal_ActivateAccountInstructions" xml:space="preserve">
+    <value>(By activating account we will send you an activation email where you need to set a password in the store. After you log in you can come back to the ckeckout)</value>
+  </data>
+  <data name="AccountModal_ActivateAccountMessage" xml:space="preserve">
+    <value>We see that you have an account with {0}, but you have no active account for {1}</value>
+  </data>
+  <data name="AccountModal_Cancel" xml:space="preserve">
+    <value>Change Email</value>
+  </data>
+  <data name="AccountModal_Header" xml:space="preserve">
+    <value>Email already attached to an accaount</value>
+  </data>
+  <data name="AccountModal_Login" xml:space="preserve">
+    <value>Log In</value>
+  </data>
+  <data name="AccountModal_LogInMessage" xml:space="preserve">
+    <value>We see that the email you have provided is associated with a {0} account already. Please log in or provide a different email!</value>
+  </data>
+  <data name="Account_InternationalAccountEnrollment" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Account_InternationalAccountShopping" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Account_LanguageSelector" xml:space="preserve">
+    <value>Preferred Language</value>
+  </data>
+  <data name="Account_PageTitle" xml:space="preserve">
+    <value>Create Account</value>
+  </data>
+  <data name="Account_Password" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="Account_YourBirthday" xml:space="preserve">
+    <value>Your Birthday</value>
+  </data>
+  <data name="Address2" xml:space="preserve">
+    <value>Apt building </value>
+  </data>
+  <data name="AutoOrder_AddressSameAsShipping" xml:space="preserve">
+    <value>Subscription Address Same As Shipping Address</value>
+  </data>
+  <data name="AutoOrder_AddToExisitingAutoOrder" xml:space="preserve">
+    <value>Add to {0}</value>
+  </data>
+  <data name="AutoOrder_AutoOrderShippingAddress" xml:space="preserve">
+    <value>Subscription Shipping Address</value>
+  </data>
+  <data name="AutoOrder_Continue" xml:space="preserve">
+    <value>Continue</value>
+  </data>
+  <data name="AutoOrder_CreateNewAutoOrder" xml:space="preserve">
+    <value>Create new Subscription</value>
+  </data>
+  <data name="AutoOrder_Heading" xml:space="preserve">
+    <value>Subscription</value>
+  </data>
+  <data name="AutoOrder_HowOftenDoYouWantToRecieve" xml:space="preserve">
+    <value>How often do you want to receive your subscription?</value>
+  </data>
+  <data name="AutoOrder_NextRunDate" xml:space="preserve">
+    <value>Next Rundate:</value>
+  </data>
+  <data name="AutoOrder_PageTitle" xml:space="preserve">
+    <value>Subscription Setup</value>
+  </data>
+  <data name="AutoOrder_StartingOn" xml:space="preserve">
+    <value>Starting On</value>
+  </data>
+  <data name="BreadCrumb_Account" xml:space="preserve">
+    <value>Account Details</value>
+  </data>
+  <data name="BreadCrumb_AutoOrder" xml:space="preserve">
+    <value>Subscription</value>
+  </data>
+  <data name="BreadCrumb_Cart" xml:space="preserve">
+    <value>Cart</value>
+  </data>
+  <data name="BreadCrumb_EnrollmentInfo" xml:space="preserve">
+    <value>Enrollment Info</value>
+  </data>
+  <data name="BreadCrumb_Information" xml:space="preserve">
+    <value>Information</value>
+  </data>
+  <data name="BreadCrumb_Payment" xml:space="preserve">
+    <value>Payment</value>
+  </data>
+  <data name="BreadCrumb_ShippingAddress" xml:space="preserve">
+    <value>Shipping Address</value>
+  </data>
+  <data name="BreadCrumb_ThankYou" xml:space="preserve">
+    <value>Thank you</value>
+  </data>
+  <data name="Cart_AutoOrderTitle" xml:space="preserve">
+    <value>Subscription</value>
+  </data>
+  <data name="Cart_Discounts" xml:space="preserve">
+    <value>Discounts</value>
+  </data>
+  <data name="Cart_Frequency" xml:space="preserve">
+    <value>Frequency</value>
+  </data>
+  <data name="Cart_HideCartContent" xml:space="preserve">
+    <value>Hide Cart Content</value>
+  </data>
+  <data name="Cart_InternationalShippingFee" xml:space="preserve">
+    <value>International Shipping Fee</value>
+  </data>
+  <data name="Cart_NextProcessDate" xml:space="preserve">
+    <value>Next Process Date</value>
+  </data>
+  <data name="Cart_PaidWithPoints" xml:space="preserve">
+    <value>Paid With Points</value>
+  </data>
+  <data name="Cart_Shipping" xml:space="preserve">
+    <value>Shipping</value>
+  </data>
+  <data name="Cart_ShippingCalculatedAtNextSTep" xml:space="preserve">
+    <value>Calculated at next step</value>
+  </data>
+  <data name="Cart_ShowCartContent" xml:space="preserve">
+    <value>Show Cart Content</value>
+  </data>
+  <data name="Cart_SubTotal" xml:space="preserve">
+    <value>Sub Total</value>
+  </data>
+  <data name="Cart_Tax" xml:space="preserve">
+    <value>Tax</value>
+  </data>
+  <data name="Cart_TaxCalculatedAtNextStep" xml:space="preserve">
+    <value>Tax calculated at next step</value>
+  </data>
+  <data name="Cart_TodaysOrderTitle" xml:space="preserve">
+    <value>Today's Order</value>
+  </data>
+  <data name="Cart_Total" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="City" xml:space="preserve">
+    <value>City</value>
+  </data>
+  <data name="Common_MobilePhone" xml:space="preserve">
+    <value>Cellphone</value>
+  </data>
+  <data name="Country" xml:space="preserve">
+    <value>Country</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="EnrollerSearch_Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="EnrollerSearch_Edit" xml:space="preserve">
+    <value>Change</value>
+  </data>
+  <data name="EnrollerSearch_Enroller" xml:space="preserve">
+    <value>Enroller</value>
+  </data>
+  <data name="EnrollerSearch_Error" xml:space="preserve">
+    <value>Something went wrong with the search</value>
+  </data>
+  <data name="EnrollerSearch_InputPlaceholder" xml:space="preserve">
+    <value>Search for name or ID</value>
+  </data>
+  <data name="EnrollerSearch_ModalClose" xml:space="preserve">
+    <value>Continue without referral</value>
+  </data>
+  <data name="EnrollerSearch_ModalHeader" xml:space="preserve">
+    <value>Search for enroller</value>
+  </data>
+  <data name="EnrollerSearch_ModalText" xml:space="preserve">
+    <value>You are not associated with any referral. Please search for your referral!</value>
+  </data>
+  <data name="EnrollerSearch_NoResult" xml:space="preserve">
+    <value>No results from search</value>
+  </data>
+  <data name="EnrollmentInfo_ContinueButton" xml:space="preserve">
+    <value>Continue</value>
+  </data>
+  <data name="EnrollmentInfo_EnrollerCheckboxText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="EnrollmentInfo_LoginName" xml:space="preserve">
+    <value>Username</value>
+  </data>
+  <data name="EnrollmentInfo_PageTitle" xml:space="preserve">
+    <value>Enrollment Information</value>
+  </data>
+  <data name="EnrollmentInfo_PoliciesCheckboxText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="EnrollmentInfo_SectionHeader" xml:space="preserve">
+    <value>Enrollment Info</value>
+  </data>
+  <data name="EnrollmentInfo_TermsAndConditionsHeader" xml:space="preserve">
+    <value>Terms And Conditions</value>
+  </data>
+  <data name="EnrollmentInfo_TermsAndConditionsHtml" xml:space="preserve">
+    <value>&lt;h3&gt;IMPORTANT INFORMATION: PLEASE READ&lt;/h3&gt;
+            &lt;p&gt;Before you may continue with your application, please review the Terms And Conditions of the Brand Partner Agreement and Policies and Procedures located below.&lt;/p&gt;
+            &lt;p&gt;
+                Once you have reviewed the Policies, and if you agree to abide by them, please click the "I agree" box located below and continue with your application to become an Independent Brand Partner. 
+                &lt;b&gt;PLEASE NOTE THAT BY CLICKING "I AGREE" YOU INDICATE THAT YOU HAVE READ AND UNDERSTAND THE POLICIES, AND AGREE TO BE BOUND BY THEM.&lt;/b&gt;
+            &lt;/p&gt;
+            &lt;p&gt;If you do not agree to be bound by the Policies, please &lt;a href="https://{0}"&gt;click here&lt;/a&gt; and you will be returned to the home page.&lt;/p&gt;</value>
+  </data>
+  <data name="EnrollmentInfo_WebsiteFeeCheckboxText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="FirstName" xml:space="preserve">
+    <value>Firstname</value>
+  </data>
+  <data name="Footer_PrivacyPolicy" xml:space="preserve">
+    <value>Privacy Policy</value>
+  </data>
+  <data name="Footer_RefundPolicy" xml:space="preserve">
+    <value>Refund Policy</value>
+  </data>
+  <data name="Footer_ShippingPolicy" xml:space="preserve">
+    <value>Shipping Policy</value>
+  </data>
+  <data name="Footer_TermsOfUse" xml:space="preserve">
+    <value>Terms of Use</value>
+  </data>
+  <data name="Information_AcceptMarketingLabel" xml:space="preserve">
+    <value>Accept Marketing</value>
+  </data>
+  <data name="Information_AccountDetails" xml:space="preserve">
+    <value>Account Details</value>
+  </data>
+  <data name="Information_AddressHeading" xml:space="preserve">
+    <value>Address</value>
+  </data>
+  <data name="Information_AlreadyHaveAnAccount" xml:space="preserve">
+    <value>Already have an account?</value>
+  </data>
+  <data name="Information_ContinueButton" xml:space="preserve">
+    <value>Continue</value>
+  </data>
+  <data name="Information_LogIn" xml:space="preserve">
+    <value>Log in</value>
+  </data>
+  <data name="Information_ShoppingSameAsMain" xml:space="preserve">
+    <value>Shipping Address Same As this address</value>
+  </data>
+  <data name="LastName" xml:space="preserve">
+    <value>Lastname</value>
+  </data>
+  <data name="OrderComplete_AddedToAutoOrderMessage" xml:space="preserve">
+    <value>&lt;div class="row"&gt;
+                &lt;div class="col-sm-12"&gt;
+                    &lt;h4&gt;The items has been added to your autoorder&lt;/h4&gt;
+                    &lt;div class="col-sm-6"&gt;
+                        &lt;a href="{1}/account?clearcart=true" class="btn btn-primary btn-block float-right" style="margin-top:20px"&gt;Go to subscription&lt;/a&gt;
+                    &lt;/div&gt;
+                    &lt;div class="col-sm-6"&gt;
+                        &lt;a href="{1}?clearcart=true" class="btn btn-primary btn-block float-right" style="margin-top:20px"&gt;Go back to shop&lt;/a&gt;
+                    &lt;/div&gt;
+                    &lt;div class="col-sm-6"&gt;
+                        &lt;a href="{1}/account?clearcart=true" class="btn btn-primary btn-block float-right" style="margin-top:20px"&gt;Go to your account&lt;/a&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;</value>
+  </data>
+  <data name="OrderComplete_AutoOrderSavedMessage" xml:space="preserve">
+    <value>&lt;div class="row"&gt;
+                &lt;div class="col-sm-12"&gt;
+                    &lt;h4&gt;Your autorder has been saved&lt;/h4&gt;
+                    &lt;div class="col-sm-6"&gt;
+                        &lt;a href="{1}?clearcart=true" class="btn btn-primary btn-block float-right" style="margin-top:20px"&gt;Go back to shop&lt;/a&gt;
+                    &lt;/div&gt;
+                    &lt;div class="col-sm-6"&gt;
+                        &lt;a href="{1}/account?clearcart=true" class="btn btn-primary btn-block float-right" style="margin-top:20px"&gt;Go to your account&lt;/a&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;</value>
+  </data>
+  <data name="OrderComplete_FailedMessage" xml:space="preserve">
+    <value>&lt;div class="row"&gt;
+                &lt;div class="col-sm-12"&gt;
+                    &lt;h4&gt;Something went wrong.&lt;/h4&gt;&lt;p&gt;Please contact customer care!&lt;/p&gt;
+                    &lt;div class="col-sm-6"&gt;
+                        &lt;a href="{0}?clearcart=true" class="btn btn-primary btn-block float-right" style="margin-top:20px"&gt;Go back to shop&lt;/a&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;</value>
+  </data>
+  <data name="OrderComplete_FailedMessageAccount" xml:space="preserve">
+    <value>&lt;div class="row"&gt;
+                &lt;div class="col-sm-12"&gt;
+                    &lt;h4&gt;Your payment was interupted.&lt;/h4&gt;&lt;p&gt;Please contact customer care if your order is not set to paid status withing 30 minutes or you have questions&lt;/p&gt;
+                    &lt;div class="col-sm-6"&gt;
+                        &lt;a href="https://lordeandbelle.com/account?clearcart=true" class="btn btn-primary btn-block float-right" style="margin-top:20px"&gt;Go to your account&lt;/a&gt;
+                    &lt;/div&gt;
+                    &lt;div class="col-sm-6"&gt;
+                        &lt;a href="https://lordeandbelle.com?clearcart=true" class="btn btn-primary btn-block float-right" style="margin-top:20px"&gt;Go back to shop&lt;/a&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;</value>
+  </data>
+  <data name="OrderComplete_FailedMessageToken" xml:space="preserve">
+    <value>&lt;div class="row"&gt;
+            &lt;div class="col-sm-12"&gt;
+                &lt;h4&gt;Thank you for your order&lt;/h4&gt;&lt;p&gt;The payment process was interupted and did not finish properly. Please contact customer care to verify that it was successful. 
+To check the status of your order, please activate your account by clicking the button below, to get access to your customer account dashboard by setting a password.&lt;br/&gt;(Our system use several minutes to register the payment, so please allow some time for it to update)&lt;/p&gt;
+            &lt;/div&gt;
+            &lt;div class="col-sm-12"&gt;
+                &lt;a href="{0}/account?clearcart=true" class="btn btn-primary btn-block float-right" style="margin-top:20px"&gt;Log in to your account&lt;/a&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;</value>
+  </data>
+  <data name="OrderComplete_RegistrationCompletedMessage" xml:space="preserve">
+    <value>&lt;div class="row"&gt;
+            &lt;div class="col-sm-12"&gt;
+                &lt;h4&gt;Thank you for your Registration&lt;/h4&gt;
+                &lt;p&gt;There is one last step for your account to be set up. Press the button below to activate your account!&lt;/p&gt;
+            &lt;/div&gt;
+            &lt;div class="col-sm-12"&gt;
+                &lt;a href="{0}/account?clearcart=true" class="btn btn-primary btn-block float-right" style="margin-top:20px"&gt;Log in to your account&lt;/a&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;</value>
+  </data>
+  <data name="OrderComplete_ThankYouMessage" xml:space="preserve">
+    <value>&lt;div class="row"&gt;
+                &lt;div class="col-sm-12"&gt;
+                    &lt;h4&gt;Thank you for your order&lt;/h4&gt;
+                    &lt;div class="col-sm-6"&gt;
+                        &lt;a href="{0}/account?clearcart=true" class="btn btn-primary btn-block float-right" style="margin-top:20px"&gt;Go to your account&lt;/a&gt;
+                    &lt;/div&gt;
+                    &lt;div class="col-sm-6"&gt;
+                        &lt;a href="{0}?clearcart=true" class="btn btn-primary btn-block float-right" style="margin-top:20px"&gt;Go back to shop&lt;/a&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;</value>
+  </data>
+  <data name="Payments_AlltransactionsAreEncrypted" xml:space="preserve">
+    <value>All transactions are encrypted and secure.</value>
+  </data>
+  <data name="Payments_BillingAddressSameAsShipping" xml:space="preserve">
+    <value>Billing Address Same As Shipping</value>
+  </data>
+  <data name="Payments_CardInvalidMessage" xml:space="preserve">
+    <value>You have provide invalid card credentials</value>
+  </data>
+  <data name="Payments_CardNumber" xml:space="preserve">
+    <value>Cardnumber</value>
+  </data>
+  <data name="Payments_CreditCard" xml:space="preserve">
+    <value>Creditcard</value>
+  </data>
+  <data name="Payments_CVV" xml:space="preserve">
+    <value>CVV</value>
+  </data>
+  <data name="Payments_ExpirationDate" xml:space="preserve">
+    <value>Expiration Date</value>
+  </data>
+  <data name="Payments_HowManyPoints" xml:space="preserve">
+    <value>How many points</value>
+  </data>
+  <data name="Payments_NameOnCard" xml:space="preserve">
+    <value>Name On Card</value>
+  </data>
+  <data name="Payments_PageTitle" xml:space="preserve">
+    <value>Review &amp; Payment</value>
+  </data>
+  <data name="Payments_PaymentHeading" xml:space="preserve">
+    <value>Payment</value>
+  </data>
+  <data name="Payments_PayWithPointsHeading" xml:space="preserve">
+    <value>Pay with points</value>
+  </data>
+  <data name="Payments_PlaceOrderButton" xml:space="preserve">
+    <value>Place Order</value>
+  </data>
+  <data name="Payments_PlacingOrderMessage" xml:space="preserve">
+    <value>Your order is being placed. Please Wait...</value>
+  </data>
+  <data name="Payments_PointAccountToHighAmountMessage" xml:space="preserve">
+    <value>The amount entered is greater than current balance</value>
+  </data>
+  <data name="Payments_PointsBalance" xml:space="preserve">
+    <value>Points Balance</value>
+  </data>
+  <data name="Payments_ShipmethodsHeading" xml:space="preserve">
+    <value>Shipmethod</value>
+  </data>
+  <data name="Payments_ShippingCalculationErrorMessage" xml:space="preserve">
+    <value>Something went wromg with shipping calculation</value>
+  </data>
+  <data name="Payments_UsePoints" xml:space="preserve">
+    <value>Use Points</value>
+  </data>
+  <data name="Phone" xml:space="preserve">
+    <value>Phone</value>
+  </data>
+  <data name="ShippingAddress_ContinueButton" xml:space="preserve">
+    <value>Ship to this address</value>
+  </data>
+  <data name="ShippingAddress_NewAddressButton" xml:space="preserve">
+    <value>Enter new Address</value>
+  </data>
+  <data name="ShippingAddress_NewAddressHeading" xml:space="preserve">
+    <value>Shipping Address</value>
+  </data>
+  <data name="ShippingAddress_PageTitle" xml:space="preserve">
+    <value>Shipping Address</value>
+  </data>
+  <data name="ShippingAddress_SelectThisAddress" xml:space="preserve">
+    <value>Select this address</value>
+  </data>
+  <data name="State" xml:space="preserve">
+    <value>State</value>
+  </data>
+  <data name="StreetAddress" xml:space="preserve">
+    <value>Streetaddress</value>
+  </data>
+  <data name="Summary_AutoOrder" xml:space="preserve">
+    <value>Subscription</value>
+  </data>
+  <data name="Summary_AutoorderStartingAt" xml:space="preserve">
+    <value>Starting at:</value>
+  </data>
+  <data name="Summary_Contact" xml:space="preserve">
+    <value>Contact</value>
+  </data>
+  <data name="Summary_Edit" xml:space="preserve">
+    <value>Change</value>
+  </data>
+  <data name="Summary_ShipTo" xml:space="preserve">
+    <value>Ship To</value>
+  </data>
+  <data name="Zip" xml:space="preserve">
+    <value>Zip</value>
+  </data>
+</root>

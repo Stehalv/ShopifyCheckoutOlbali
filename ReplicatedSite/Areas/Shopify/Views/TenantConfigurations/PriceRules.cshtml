@@ -1,0 +1,42 @@
+﻿@using ReplicatedSite;
+@model ReplicatedSite.Areas.Shopify.ViewModels.TenantConfigurationPriceRuleViewModel
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Areas/Shopify/Views/TenantConfigurations/_Layout.cshtml";
+}
+
+<h2>Price Rules</h2>
+<a href="@Url.Action("create", "PriceRule", new { tenantConfigId = Model.Config.Id })">Create New</a>
+<table width="100%">
+    <tr>
+        <th>Title</th>
+        <th>Methhod</th>
+        <th>Type</th>
+        <th>Value</th>
+        <th></th>
+    </tr>
+    @foreach (var rule in Model.Rules)
+    {
+        <tr>
+            <td>
+                @rule.Title
+            </td>
+            <td>
+                @rule.AllocationMethod
+            </td>
+            <td>
+                @rule.ValueType
+            </td>
+            <td>
+                @rule.Value
+            </td>
+            <td>
+                <a href="@Url.Action("edit", "PriceRule", new { id = rule.Id, tenantConfigId = Model.Config.Id })">Details</a>/
+                <a href="@Url.Action("delete", "PriceRule", new { id = rule.Id, tenantConfigId = Model.Config.Id })">Delete</a>
+            </td>
+        </tr>
+    }
+
+</table>
+

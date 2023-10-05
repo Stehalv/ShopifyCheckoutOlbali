@@ -1,0 +1,124 @@
+﻿@model ShoppingCartCheckoutPropertyBag
+@{
+}
+
+<style>
+    #search-results {
+        width: 96.4%;
+        position: absolute;
+        top: 53px;
+        border: 1px solid #d9d9d9;
+        border-top: none;
+        border-bottom: 3px solid #d9d9d9;
+        padding: 0.9285714286em 0.7857142857em;
+        background-color: white;
+        z-index: 3;
+        display: none;
+        max-height: 300px;
+        overflow: auto;
+    }
+
+
+        #search-results::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        #search-results::-webkit-scrollbar-track {
+            -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+            border-radius: 10px;
+        }
+
+        #search-results::-webkit-scrollbar-thumb {
+            border-radius: 10px;
+            -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+        }
+</style>
+<div role="row" class="review-block">
+    @if (Identity.Customer == null)
+    {
+        <div class="review-block__inner">
+            <div role="rowheader" class="review-block__label">
+                @Resources.Checkout.EnrollerSearch_Enroller
+            </div>
+            <div class="review-block__content">
+                <div id="enroller-display" class="enroller-toggle">
+                    <bdo dir="ltr">@Identity.Owner.FullName  (#@Identity.Owner.CustomerID)</bdo>
+                </div>
+                <div id="enroller-search" class="enroller-toggle" style="display:none; position:relative">
+                    <div class="field field--show-floating-label">
+                        <div class="field__input-wrapper">
+                            <label class="field__label field__label--visible">@Resources.Checkout.EnrollerSearch_InputPlaceholder.</label>
+                            <input type="text" id="enroller-search-field" class="field__input" />
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div id="search-results">
+                            @Resources.Checkout.EnrollerSearch_NoResult
+                        </div>
+                        <script id="search-results-template" data-target="#search-results" type="text/x-handlebars-template">
+                            {{#each enrollers}}
+                            <div class="row" style="padding:10px;">
+                                <div class="col-sm-12">
+                                    <span><span class="name">{{FullName}}</span>, @Resources.Common.ID# <span class="id">{{CustomerID}}</span></span><br />
+                                    <span>{{MainCity}}, {{MainState}}</span><br />
+                                    <a href="{{ url }}" class="btn btn-primary">@Resources.Common.Choose</a>
+                                </div>
+                            </div>
+                            {{/each}}
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+        if (!Model.Cart.Completed)
+        {
+            <div class="review-block__link">
+                <a class="link--small" data-role="change-enroller" href="#">
+                    <span aria-hidden="true" class="enroller-toggle">@Resources.Checkout.EnrollerSearch_Edit</span>
+                    <span aria-hidden="true" class="enroller-toggle" style="display:none">@Resources.Checkout.EnrollerSearch_Close</span>
+                </a>
+            </div>
+        }
+    }
+</div>
+
+<script>
+    require(["jquery", "handlebars"], function ($, handlebars) {
+        function newlink(webalias) {
+            var link = location.href.toLowerCase();
+            console.log(link);
+            return link.replace("/@Identity.Owner.WebAlias.ToLower()/", "/" + webalias + "/");
+        }
+        $('[data-role="change-enroller"]').on("click", function () {
+            $(".enroller-toggle").toggle();
+        });
+        $('[data-role="use-distributor"]').on("click", function () {
+        });
+        $("#enroller-search-field").on("keyup", function () {
+            var query = $(this).val();
+            $.ajax({
+                url: "@Url.Action("getdistributors", "ShopifyCheckout")",
+                data: { query: query },
+                type: "POST",
+                success: function (response) {
+                    if (response.success) {
+                        if (response.enrollers.length == 0) {
+                            $("#search-results").html("@Resources.Common.SearchNoResults");
+                        }
+                        for (const e of response.enrollers) {
+                            e["url"] = newlink(e.WebAlias);
+                        }
+                        var source = $("#search-results-template").html();
+                        var template = handlebars.compile(source);
+                        var html = template(response);
+                        $("#search-results").html(html);
+                        $("#search-results").show();
+                    }
+                    else {
+                        $("#search-results").html("@Resources.Checkout.EnrollerSearch_Error");
+                    }
+                }
+            });
+        });
+    });
+</script>

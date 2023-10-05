@@ -1,0 +1,301 @@
+﻿@model ShopifyApp.Models.Cart
+@{
+    ViewBag.Title = Resources.Common.ShippingAddress;
+    var pointsVisible = (Model.PointsTotal < 0) ? "" : "display:none";
+}
+<div class="row">
+    <div class="col-sm-12">
+        @if (Model.OrderItems.Any() || Model.EnrollmentPackItems.Any())
+        {
+            var orderItems = Model.OrderItems.Where(c => !c.IsDiscountItem).ToList();
+            <h4>@Resources.Checkout.Cart_TodaysOrderTitle</h4>
+            <hr />
+            <table class="product-table">
+                <tbody data-order-summary-section="line-items">
+                    @foreach (var item in Model.EnrollmentPackItems)
+                    {
+                        <tr class="product">
+                            <td class="product__image">
+                                <div class="product-thumbnail ">
+                                    <div class="product-thumbnail__wrapper">
+                                        <img alt="@item.Product_Title - @ShopifyApp.Settings.CompanyName" class="product-thumbnail__image" src="@item.Featured_Image.Url">
+                                    </div>
+                                    <span class="product-thumbnail__quantity" aria-hidden="true">@item.Quantity</span>
+                                </div>
+
+                            </td>
+                            <th class="product__description" scope="row">
+                                <span class="product__description__name order-summary__emphasis">@item.Product_Title</span>
+                                <span class="product__description__variant order-summary__small-text">Enrollment kit</span>
+
+                            </th>
+                            <td class="product__quantity">
+                                <span class="visually-hidden">
+
+                                </span>
+                            </td>
+                            <td class="product__price">
+                                <span class="order-summary__emphasis skeleton-while-loading">@item.FinalPriceString</span>
+                            </td>
+                        </tr>
+                    }
+                    @foreach (var item in orderItems)
+                    {
+                        <tr class="product">
+                            <td class="product__image">
+                                @if (item.Featured_Image != null)
+                                {
+                                    <div class="product-thumbnail ">
+                                        <div class="product-thumbnail__wrapper">
+                                            <img alt="@item.Product_Title - @ShopifyApp.Settings.CompanyName" class="product-thumbnail__image" src="@item.Featured_Image.Url">
+                                        </div>
+                                        <span class="product-thumbnail__quantity" aria-hidden="true">@item.Quantity</span>
+                                    </div>
+                                }
+
+                            </td>
+                            <th class="product__description" scope="row">
+                                <span class="product__description__name order-summary__emphasis">@item.Product_Title</span>
+                                @if (item.Variant_Title.IsNotNullOrEmpty())
+                                {
+                                    <span class="product__description__variant order-summary__small-text">@item.Variant_Title</span>
+                                }
+
+                            </th>
+                            <td class="product__quantity">
+                                <span class="visually-hidden">
+
+                                </span>
+                            </td>
+                            <td class="product__price">
+                                <span class="order-summary__emphasis skeleton-while-loading">@item.FinalPriceString</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div class="order-summary__section order-summary__section--total-lines">
+                <table class="total-line-table">
+                    <tbody class="total-line-table__tbody">
+                        @if (Model.DiscountItems.Any())
+                        {
+                            var discountsDescription = string.Join(",", Model.DiscountItems.Select(c => c.Product_Title).ToList());
+                            <tr class="total-line total-line--subtotal">
+                                <th class="total-line__name" scope="row">@Resources.Checkout.Cart_Discounts (@discountsDescription)</th>
+                                <td class="total-line__price">
+                                    <span class="order-summary__emphasis skeleton-while-loading">
+                                        @Model.DiscountItems.Sum(c => c.Final_Line_Price).ToString("c")
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                        <tr class="total-line total-line--subtotal">
+                            <th class="total-line__name" scope="row">@Resources.Checkout.Cart_SubTotal</th>
+                            <td class="total-line__price">
+                                <span class="order-summary__emphasis skeleton-while-loading">
+                                    @Model.SubTotal.ToString("c")
+                                </span>
+                            </td>
+                        </tr>
+                        <tr class="total-line total-line--shipping">
+                            <th class="total-line__name" scope="row">
+                                <span>
+                                    @Resources.Checkout.Cart_Shipping
+                                </span>
+                            </th>
+                            <td class="total-line__price">
+                                <span class="skeleton-while-loading order-summary__small-text">
+                                    @if (!Model.ShippingCalculated && !Model.IsPaymentOfExistingOrder)
+                                    {
+                                        <span>@Resources.Checkout.Cart_ShippingCalculatedAtNextSTep</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="shippingTotal summaryTotals">@Model.ShippingTotal.ToString("c")</span>
+                                    }
+                                </span>
+                            </td>
+                        </tr>
+                        @if (Model.InternationalShippingFee > 0)
+                        {
+                            <tr class="total-line total-line--shipping">
+                                <th class="total-line__name" scope="row">
+                                    <span>
+                                        @Resources.Checkout.Cart_InternationalShippingFee
+                                    </span>
+                                </th>
+                                <td class="total-line__price">
+                                    <span class="skeleton-while-loading order-summary__small-text">
+                                            <span class="summaryTotals">@Model.InternationalShippingFee.ToString("c")</span>
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                        @if (Model.IsCalculated && !Model.IsPaymentOfExistingOrder)
+                        {
+                            <tr class="total-line total-line--tax">
+                                <th class="total-line__name">
+                                    <span>
+                                        @Resources.Checkout.Cart_Tax
+                                    </span>
+                                </th>
+                                <td class="total-line__price">
+                                    <span class="skeleton-while-loading order-summary__small-text taxTotal summaryTotals">
+                                        @Model.TaxTotal.ToString("c")
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                        <tr class="total-line total-line--points" style="@pointsVisible">
+                            <th class="total-line__name">
+                                <span>
+                                    @Resources.Checkout.Cart_PaidWithPoints
+                                </span>
+                            </th>
+                            <td class="total-line__price">
+                                <span class="skeleton-while-loading order-summary__small-text pointsTotal summaryTotals">
+                                    @Model.PointsTotal.ToString("c")
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot class="total-line-table__footer">
+                        <tr class="total-line">
+                            <th class="total-line__name payment-due-label" scope="row">
+                                <span class="payment-due-label__total">@Resources.Checkout.Cart_Total</span>
+                                @if (!Model.IsCalculated && !Model.IsPaymentOfExistingOrder)
+                                {
+                                    <span class="payment-due-label__taxes order-summary__small-text ">
+                                        @Resources.Checkout.Cart_TaxCalculatedAtNextStep
+                                    </span>
+                                }
+                            </th>
+                            <td class="total-line__price payment-due">
+                                <span class="payment-due__currency remove-while-loading">@Model.Currency</span>
+                                <span class="payment-due__price skeleton-while-loading--lg orderTotal summaryTotals">
+                                    @Model.OrderTotal.ToString("c")
+                                </span>
+                            </td>
+                        </tr>
+
+                    </tfoot>
+                </table>
+
+            </div>
+        }
+        @if (Model.AutoOrderItems.Any())
+        {
+            var autoOrderSubTotal = Model.AutoOrderTotal + Model.ShippingTotal;
+            if (Model.AutoOrderSaved)
+            {
+                <h4 style="margin-top:20px;">Added to AutoOrder</h4>
+            }
+            else
+            {
+                <h4 style="margin-top:20px;">@Resources.Checkout.Cart_AutoOrderTitle</h4>
+            }
+            <div class="order-summary__section order-summary__section--total-lines">
+                <table class="total-line-table">
+                    <tbody class="total-line-table__tbody">
+                        @if (Model.AutoOrderFrequency.IsNotNullOrEmpty())
+                        {
+                            <tr class="total-line total-line--shipping">
+                                <th class="total-line__name" scope="row">
+                                    <span>
+                                        @Resources.Checkout.Cart_Frequency
+                                    </span>
+                                </th>
+                                <td class="total-line__price">
+                                    <span class="skeleton-while-loading order-summary__small-text">
+                                        @Model.AutoOrderFrequency
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                        @if (Model.AutoOrderStartDate != DateTime.MinValue)
+                        {
+                            <tr class="total-line total-line--shipping">
+                                <th class="total-line__name" scope="row">
+                                    <span>
+                                        @Resources.Checkout.Cart_NextProcessDate
+                                    </span>
+                                </th>
+                                <td class="total-line__price">
+                                    <span id="taxTotal" class="skeleton-while-loading order-summary__small-text">
+                                        @Model.AutoOrderStartDate.ToShortDateString()
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <table class="product-table">
+                <tbody data-order-summary-section="line-items">
+                    @foreach (var item in Model.AutoOrderItems)
+                    {
+                        <tr class="product">
+                            <td class="product__image">
+                                <div class="product-thumbnail ">
+                                    <div class="product-thumbnail__wrapper">
+                                        <img alt="@item.Product_Title - @ShopifyApp.Settings.CompanyName" class="product-thumbnail__image" src="@item.Featured_Image.Url">
+                                    </div>
+                                    <span class="product-thumbnail__quantity" aria-hidden="true">@item.Quantity</span>
+                                </div>
+
+                            </td>
+                            <th class="product__description" scope="row">
+                                <span class="product__description__name order-summary__emphasis">@item.Product_Title</span>
+                                @if (item.Variant_Title.IsNotNullOrEmpty())
+                                {
+                                    <span class="product__description__variant order-summary__small-text">@item.Variant_Title</span>
+                                }
+
+                            </th>
+                            <td class="product__quantity">
+                                <span class="visually-hidden">
+                                </span>
+                            </td>
+                            <td class="product__price">
+                                <span class="order-summary__emphasis skeleton-while-loading">@item.FinalPriceString</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div class="order-summary__section order-summary__section--total-lines">
+                <table class="total-line-table">
+                    <tbody class="total-line-table__tbody">
+                        <tr class="total-line total-line--shipping">
+                            <th class="total-line__name" scope="row">
+                                <span>
+                                    @Resources.Checkout.Cart_Shipping
+                                </span>
+                            </th>
+                            <td class="total-line__price">
+                                <span class="skeleton-while-loading order-summary__small-text">
+                                    @if (!Model.ShippingCalculated && !Model.IsPaymentOfExistingOrder)
+                                    {
+                                        <span>@Resources.Checkout.Cart_ShippingCalculatedAtNextSTep</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="shippingTotal summaryTotals">@Model.ShippingTotal.ToString("c")</span>
+                                    }
+                                </span>
+                            </td>
+                        </tr>
+                        <tr class="total-line total-line--subtotal">
+                            <th class="total-line__name" scope="row">@Resources.Checkout.Cart_SubTotal</th>
+                            <td class="total-line__price">
+                                <span class="order-summary__emphasis skeleton-while-loading autoorderSubtotal">
+                                    @autoOrderSubTotal.ToString("c")
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

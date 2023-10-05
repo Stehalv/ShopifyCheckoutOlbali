@@ -1,0 +1,111 @@
+﻿@model ShoppingCartCheckoutPropertyBag
+@{
+    var displayEnroller = Model.Customer.CustomerID == 0;
+    var displayAccount = Model.Cart.Account && Model.Customer.CustomerID == 0;
+    var displayShippingAddress = Model.Cart.ShippingAddress;
+    var displayAutoOrder = Model.AutoOrderAddressSameAsShipping && Model.Cart.AutoOrderItems.Any();
+    var displayEnrollmentInfo = (Model.Cart.AutoOrderItems.Any() && Model.Cart.AutoOrder) || (Model.Cart.ShippingAddress && Model.Cart.AutoOrderItems.Count() == 0) && Model.Cart.CartType == ShopifyApp.CartType.Enrollment;
+    var currentStep = Request.RequestContext.RouteData.Values["action"].ToString().ToLower();
+}
+
+<div class="section">
+    <div class="content-box">
+        <div class="content-box__row content-box__row--tight-spacing-vertical">
+            @if (displayEnroller)
+            {
+                @Html.Partial("Partials/_Enroller", Model)
+            }
+            @if (displayAccount)
+            {
+                <div role="row" class="review-block">
+                    <div class="review-block__inner">
+                        <div role="rowheader" class="review-block__label">
+                            @Resources.Checkout.Summary_Contact
+                        </div>
+                        <div class="review-block__content">
+                            <bdo dir="ltr">@Model.Customer.Email</bdo>
+                        </div>
+                    </div>
+                    @if (Model.Customer.CustomerID == 0 && !Model.Cart.Completed)
+                    {
+
+                        <div role="cell" class="review-block__link">
+                            <a class="link--small" href="@Url.Action("Account")">
+                                <span aria-hidden="true">@Resources.Checkout.Summary_Edit</span>
+                            </a>
+                        </div>
+                    }
+                </div>
+            }
+            @if (displayShippingAddress)
+            {
+                <div role="row" class="review-block">
+                    <div class="review-block__inner">
+                        <div role="rowheader" class="review-block__label">
+                            @Resources.Checkout.Summary_ShipTo
+                        </div>
+                        <div role="cell" class="review-block__content">
+                            <address class="address address--tight">
+                                @Model.ShippingAddress.Address1, @Model.ShippingAddress.City @Model.ShippingAddress.State @Model.ShippingAddress.Zip, @Model.ShippingAddress.Country
+                            </address>
+                        </div>
+                    </div>
+                    @if (!Model.Cart.Completed)
+                    {
+                        <div role="cell" class="review-block__link">
+                            <a class="link--small" href="@Url.Action("ShippingAddress")">
+                                <span aria-hidden="true">@Resources.Checkout.Summary_Edit</span>
+                            </a>
+                        </div>
+                    }
+                </div>
+            }
+            @if (displayAutoOrder)
+            {
+                <div role="row" class="review-block">
+                    <div class="review-block__inner">
+                        <div role="rowheader" class="review-block__label">
+                            @Resources.Checkout.Summary_AutoOrder
+                        </div>
+                        <div class="review-block__content">
+                            <address class="address address--tight">
+                                @Model.AutoOrderFrequencyType.ToString() @Resources.Checkout.Summary_AutoorderStartingAt @Model.AutoOrderStartDate.ToShortDateString()
+                            </address>
+                        </div>
+                    </div>
+                    @if (!Model.Cart.Completed)
+                    {
+                        <div class="review-block__link">
+                            <a class="link--small" href="@Url.Action("AutoOrder")">
+                                <span aria-hidden="true">@Resources.Checkout.Summary_Edit</span>
+                            </a>
+                        </div>
+                    }
+                </div>
+            }
+            @if (displayEnrollmentInfo)
+            {
+                <div role="row" class="review-block">
+                    <div class="review-block__inner">
+                        <div role="rowheader" class="review-block__label">
+                            Your Link
+                        </div>
+                        <div class="review-block__content">
+                            <address class="address address--tight">
+                                https://@Model.Cart.ShopUrl?ref=<span id="newWebalias">@Model.Customer.WebAlias</span>
+                            </address>
+                        </div>
+                    </div>
+                    @if (!Model.Cart.Completed && currentStep != "enrollmentinfo")
+                    {
+                        <div class="review-block__link">
+                            <a class="link--small" href="@Url.Action("EnrollmentInfo")">
+                                <span aria-hidden="true">@Resources.Checkout.Summary_Edit</span>
+                            </a>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>

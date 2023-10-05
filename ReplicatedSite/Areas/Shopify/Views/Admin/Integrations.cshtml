@@ -1,0 +1,38 @@
+﻿@using ReplicatedSite;
+@model ShopifyApp.Models.Tenant
+@{
+    ViewBag.Title = "Admin-Integrations";
+    Layout = "~/Areas/Shopify/Views/Admin/_Layout.cshtml";
+}
+<div>
+    <h3>Integrations</h3>
+    <table width="50%" style="margin-top:25px;" ">
+        <tr>
+            <th>
+                Webshops
+            </th>
+            <th>
+                Sandbox
+            </th>
+            <th>
+
+            </th>
+        </tr>
+        @if (Model.Configurations != null)
+        {
+            foreach (var config in Model.Configurations)
+            {
+                <tr>
+                    <td>@config.ShopUrl</td>
+                    <td>@config.UseSandbox</td>
+                    <td>
+                        @if (ShopifyApp.Settings.IsAdmin(Identity.Current.UserRole))
+                        {
+                            <a href="@Url.Action("Details", "TenantConfigurations", new { id = config.Id })">Details/ </a><a href="@Url.Action("Edit", "TenantConfigurations", new { id = config.Id })">Edit </a>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+    </table>
+</div>

@@ -1,0 +1,794 @@
+﻿@model ShopifyCheckoutViewModel
+@{
+    var market = Utilities.GetCurrentMarket();
+    ViewBag.Title = Resources.Checkout.Payments_PageTitle;
+    ViewBag.PropertyBag = Model.PropertyBag;
+    var hasAutoOrder = false;
+    var controller = ViewContext.RouteData.Values["controller"].ToString();
+    var availablePaymentMethods = GlobalUtilities.GetCurrentMarket(this.Context).AvailablePaymentTypes;
+    if(Model.PropertyBag.Cart.AutoOrderItems.Count() > 0)
+    {
+        hasAutoOrder = true;
+    }
+    var orderSubtotal = Model.PropertyBag.Cart.OrderTotal;
+    var usePointsAsPayment = Model.Payments.UsePointsAsPayment;
+    var pointsDisplay = usePointsAsPayment ? "" : "display:none";
+    var pointBalance = Model.Payments.PointAccount == null ? 0 : Math.Round(Model.Payments.PointAccount.Balance, 2);
+    var maxValue = orderSubtotal > pointBalance ? pointBalance : orderSubtotal;
+    var pointQuantityValue = Model.Payments.UsePointsAsPayment ? Model.Payments.QuantityOfPointsToUse : (pointBalance > orderSubtotal ? orderSubtotal : pointBalance);
+    var paymentsCount = 1;
+
+}
+
+<div class="section section--shipping-method">
+    <div class="section__header">
+        <h2 class="section__title" id="main-header" tabindex="-1">
+            @Resources.Checkout.Payments_ShipmethodsHeading
+        </h2>
+    </div>
+    <div class="section__content">
+        <div class="content-box">
+            @foreach (var method in Model.PropertyBag.Shipmethods)
+            {
+                var isChecked = (Model.PropertyBag.ShipMethodID == method.ShipMethodID) ? "checked='checked'" : "";
+                <div class="content-box__row">
+                    <div class="radio-wrapper">
+                        <div class="radio__input">
+                            <input class="input-radio" type="radio" value="@method.ShipMethodID" @isChecked name="ShipMethodId" id="ShipMethodId">
+                        </div>
+                        <label class="radio__label">
+                            <span class="radio__label__primary">
+                                @method.ShipMethodDescription
+                            </span>
+                            <span class="radio__label__accessory">
+                                <span class="content-box__emphasis">
+                                    @method.Price.ToString("c")
+                                </span>
+                            </span>
+                        </label>
+                    </div> <!-- /radio-wrapper-->
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- BEGIN Pay with Points -->
+@if (Model.Payments.HasValidPointAccount && ShopifyApp.Settings.AllowPointPayments)
+{
+    var pointAccountDescription = CommonResources.PointAccounts(Model.Payments.PointAccount.PointAccountID);
+    <div class="section section--point-transactions">
+        <div class="section__header">
+            <h2 class="section__title" id="main-header" tabindex="-1">
+                @Resources.Checkout.Payments_PayWithPointsHeading
+            </h2>
+
+            <p class="section__text" style="font-size:1em">
+                @pointAccountDescription
+            </p>
+        </div>
+
+        <div class="section__content">
+            <div class="content-box">
+                <div class="content-box__row">
+                    <div class="radio-wrapper">
+                        <div class="radio__input">
+                            @Html.CheckBoxFor(c => c.PropertyBag.UsePointsAsPayment, new { @class = "input-radio", id = "use-point-account" })
+                        </div>
+                        <label class="radio__label">
+                            <span class="radio__label__primary">
+                                @Resources.Checkout.Payments_UsePoints
+                            </span>
+                            <span class="radio__label__accessory">
+                                @Resources.Checkout.Payments_PointsBalance: <strong>@pointBalance.ToString("C")</strong>
+                            </span>
+                        </label>
+                    </div> <!-- /radio-wrapper-->
+                </div>
+            </div>
+            <div id="pointTotal" style="@pointsDisplay" class="radio-wrapper content-box__row content-box__row--secondary card-fields-container card-fields-container--loaded card-fields-container--transitioned">
+                <div class="field field--half field--show-floating-label">
+                    <div class="field__input-wrapper">
+                        <label class="field__label field__label--visible">@Resources.Checkout.Payments_HowManyPoints</label>
+                        <input type="number" id="QuantityOfPoints" name="QuantityOfPoints" max="@maxValue" value="@pointQuantityValue" step="0.01" class="field__input" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+}
+<!-- END Pay with Points -->
+<div class="section section--payment-method">
+    <div class="section__header">
+        <h2 class="section__title" id="main-header" tabindex="-1">
+            @Resources.Checkout.Payments_PaymentHeading
+        </h2>
+
+        <p class="section__text" style="font-size:1em">
+            @Resources.Checkout.Payments_AlltransactionsAreEncrypted
+        </p>
+    </div>
+
+    <div class="section__content" id="payment-methods-container">
+        <div>
+            @if (Model.Payments.PaymentMethods != null && Model.Payments.PaymentMethods.Any())
+            {
+
+                foreach (var method in Model.Payments.PaymentMethods)
+                {
+                    if (method is CreditCard)
+                    {
+                        var card = method as CreditCard;
+                        var ischecked = (paymentsCount == 1) ? "checked='checked'" : "";
+                        var display = (paymentsCount == 1) ? "" : "display:none";
+                        var formId = card.Type + "Form";
+                        <div class="content-box">
+                            <div class="content-box__row">
+                                <div class="radio-wrapper">
+                                    <div class="radio__input">
+                                        <input class="input-radio" type="radio" value="@card.Type" @ischecked name="PaymentMethod" id="PaymentMethod">
+                                    </div>
+                                    <label class="radio__label">
+                                        <span class="radio__label__primary">
+                                            @card.Type
+                                        </span>
+                                        <span class="radio__label__accessory">
+                                            <ul role="list">
+                                                <li class="payment-icon payment-icon--visa" aria-current="false">
+                                                    <span class="visually-hidden">
+                                                        Visa,
+                                                    </span>
+                                                </li>
+                                                <li class="payment-icon payment-icon--master" aria-current="false">
+                                                    <span class="visually-hidden">
+                                                        Mastercard,
+                                                    </span>
+                                                </li>
+                                                <li class="payment-icon payment-icon--american-express" aria-current="false">
+                                                    <span class="visually-hidden">
+                                                        American Express,
+                                                    </span>
+                                                </li>
+                                            </ul>
+                                        </span>
+                                    </label>
+                                </div> <!-- /radio-wrapper-->
+                            </div>
+                        </div>
+
+                        <div id="@card.Type-container" class="payment-radio radio-wrapper content-box__row content-box__row--secondary card-fields-container card-fields-container--loaded card-fields-container--transitioned" style="@display">
+                            <div class="row">
+                                <div class="col-lg-8 col-md-12">
+                                    <div>@Resources.Common.CardEndingIn @card.CardNumber</div>
+                                </div>
+                                <div class="col-lg-4 col-md-12">
+                                    <div class="@((card.IsExpired) ? "text-danger" : "")">
+                                        @card.ExpirationDate.ToString("M/yyyy")
+                                        @if (card.IsExpired)
+                                        {
+                                            <text><br />@Resources.Common.Expired</text>
+                                        }
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="space-5"></div>
+                                    @card.NameOnCard
+                                </div>
+                            </div>
+                            @using (Ajax.BeginForm("UseCreditCardOnFile", controller, new AjaxOptions()
+                            {
+                                OnBegin = "paymentoverview.onBegin",
+                                OnSuccess = "paymentoverview.onSuccess"
+
+                            }, new { id = formId }))
+                            {
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="Type" value="@card.Type" />
+                                <input type="hidden" name="UsePointAccount" value="@Model.Payments.UsePointsAsPayment" />
+                                <input type="hidden" name="QuantityOfPointsToUse" value="@Model.Payments.QuantityOfPointsToUse" />
+                                if (market.CVVRequired)
+                                {
+                                    <div class="row">
+                                        <div class="col-4">
+                                            @Html.TextBoxFor(c => c.Payments.ExistingCardCVV,
+                                        htmlAttributes: new
+                                        {
+                                            @class = "form-control",
+                                            style = "max-width: 100px;"
+                                        })
+                                        </div>
+                                        <div class="col-8">
+                                            <button type="submit" class="btn btn-primary btn-block" data-loading-text="@Resources.Common.Loading">
+                                                @Resources.Common.PayWithThisCard
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    }
+                    paymentsCount++;
+                }
+            }
+            @foreach (var paymentMethod in availablePaymentMethods)
+            {
+                if (paymentMethod.CanBeParsedAs<CreditCard>())
+                {
+                    var NewCard = new CreditCard();
+                    var contextID = Guid.NewGuid().ToString();
+                    var defaultCountryCode = market.MainCountry;
+                    var countrySelectList = Html.Countries(defaultCountryCode);
+                    var defaultRegionCode = (NewCard.BillingAddress.State.IsNotNullOrEmpty()) ? NewCard.BillingAddress.State : "";
+                    var isVerifyable = ViewData["VerifyEnabled"] == null || Convert.ToBoolean(ViewData["VerifyEnabled"]) == true;
+                    var ischecked = (paymentsCount == 1) ? "checked='checked'" : "";
+                    var display = (paymentsCount == 1) ? "" : "display:none";
+                    <div class="content-box">
+                        <div class="content-box__row">
+                            <div class="radio-wrapper">
+                                <div class="radio__input">
+                                    <input class="input-radio" type="radio" value="creditcard" @ischecked name="PaymentMethod" id="PaymentMethod">
+                                </div>
+                                <label class="radio__label">
+                                    <span class="radio__label__primary">
+                                        @Resources.Checkout.Payments_CreditCard
+                                    </span>
+                                    <span class="radio__label__accessory">
+                                        <ul role="list">
+                                            <li class="payment-icon payment-icon--visa" aria-current="false">
+                                                <span class="visually-hidden">
+                                                    Visa,
+                                                </span>
+                                            </li>
+                                            <li class="payment-icon payment-icon--master" aria-current="false">
+                                                <span class="visually-hidden">
+                                                    Mastercard,
+                                                </span>
+                                            </li>
+                                            <li class="payment-icon payment-icon--american-express" aria-current="false">
+                                                <span class="visually-hidden">
+                                                    American Express,
+                                                </span>
+                                            </li>
+                                        </ul>
+                                    </span>
+                                </label>
+                            </div> <!-- /radio-wrapper-->
+                        </div>
+                    </div>
+
+                    <div id="creditcard-container" class="payment-radio radio-wrapper content-box__row content-box__row--secondary card-fields-container card-fields-container--loaded card-fields-container--transitioned" style="@display">
+
+                        <div id="newcardcontainer">
+                            @using (Ajax.BeginForm("UseCreditCard", controller, new AjaxOptions()
+                            {
+                                OnBegin = "paymentoverview.onBegin",
+                                OnSuccess = "paymentoverview.onSuccess",
+
+                            }, new { novalidate = "novalidate", id = "creditcardForm" }))
+                            {
+                                @Html.AntiForgeryToken()
+
+                                <input type="hidden" name="UsePointAccount" value="@Model.Payments.UsePointsAsPayment" />
+                                <input type="hidden" name="QuantityOfPointsToUse" value="@Model.Payments.QuantityOfPointsToUse" />
+
+                                <div class="form-group">
+                                    <label class="control-label">@Resources.Checkout.Payments_NameOnCard</label>
+                                    @Html.TextBoxFor(c => NewCard.NameOnCard,
+                                    htmlAttributes: new
+                                    {
+                                        @class = "form-control"
+                                    })
+                                    @Html.ValidationMessageFor(c => NewCard.NameOnCard, String.Empty,
+                                        new
+                                        {
+                                            @style = "color:red; font-size:small;"
+                                        })
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">@Resources.Checkout.Payments_CardNumber</label>
+                                    <div id="cc-wrapper"></div>
+                                    @Html.ValidationMessageFor(c => NewCard.CardNumber, String.Empty,
+                                        new
+                                        {
+                                            @style = "color:red; font-size:small;"
+                                        })
+                                    @* Token and Card Display fields, populated in javascript below *@
+                                    @Html.HiddenFor(m => NewCard.Token, new { @class = "creditcard-token" })
+                                    @Html.HiddenFor(m => NewCard.Display, new { @class = "creditcard-display" })
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="control-label">@Resources.Checkout.Payments_ExpirationDate</label>
+                                    <div class="row margin-5">
+                                        <div class="col-md-8 margin-bottom--10px">
+                                            @Html.DropDownList("NewCard.ExpirationMonth", Html.Months(), new
+                                        {
+                                            @class = "form-control"
+                                        })
+                                        </div>
+                                        <div class="col-md-4">
+                                            @Html.DropDownList("NewCard.ExpirationYear", Html.ExpirationYears(), new
+                                        {
+                                            @class = "form-control"
+                                        })
+                                            @Html.ValidationMessageFor(c => NewCard.IsExpired)
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputCVV" class="control-label">@Resources.Checkout.Payments_CVV</label>
+                                    <div class="row margin-5">
+                                        <div class="col-12">
+                                            @Html.TextBoxFor(c => NewCard.CVV, new { @class = "form-control", required = "required" })
+                                            @Html.ValidationMessageFor(c => NewCard.CVV)
+                                            <script></script>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="custom-control custom-checkbox billingsameasshipping">
+                                    <input type="checkbox" class="custom-control-input" name="BillingSameAsShipping" id="BillingSameAsShipping" value="true" checked />
+                                    <label class="custom-control-label" for="BillingSameAsShipping">@Resources.Checkout.Payments_BillingAddressSameAsShipping</label>
+                                    <input type="hidden" value="false" name="BillingSameAsShipping" />
+                                </div>
+
+                                <div class="view-address" id="view-address-@contextID">
+
+                                    @Html.HiddenFor(c => NewCard.BillingAddress.AddressType, new { data_role = "AddressType" })
+                                    <div class="form-group">
+                                        @Html.LabelFor(c => NewCard.BillingAddress.Country, new { @class = "" })
+                                        @Html.DropDownListFor(c => NewCard.BillingAddress.Country,
+                                            selectList: countrySelectList,
+                                            htmlAttributes: new
+                                            {
+                                                @class = "form-control",
+                                                data_region_bind = "#" + Html.IdFor(c => NewCard.BillingAddress.State) + "_" + contextID,
+                                                data_address_bind = "#" + Html.IdFor(c => NewCard.BillingAddress.Address2) + "_" + contextID,
+                                                data_role = "Country"
+                                            })
+                                        @Html.ValidationMessageFor(c => NewCard.BillingAddress.Country)
+                                    </div>
+                                    <div class="padding-bottom--5px"></div>
+
+                                    <div class="form-group">
+                                        @Html.LabelFor(c => NewCard.BillingAddress.Address1, new { @class = "" })
+                                        @Html.TextBoxFor(c => NewCard.BillingAddress.Address1, new
+                                        {
+                                            @class = "form-control",
+                                            data_role = "Address1"
+                                        })
+                                        @Html.ValidationMessageFor(c => NewCard.BillingAddress.Address1)
+
+                                        <div class="padding-bottom--5px"></div>
+                                        <div class="form-group" @if (defaultCountryCode == "US") { <text> style="display: none;" </text> }>
+                                            @Html.TextBoxFor(c => NewCard.BillingAddress.Address2, new
+                                            {
+                                                @class = "form-control",
+                                                id = Html.IdFor(c => NewCard.BillingAddress.Address2) + "_" + contextID,
+                                                data_role = "Address2"
+                                            })
+                                            @Html.ValidationMessageFor(c => NewCard.BillingAddress.Address2)
+                                        </div>
+                                    </div>
+                                    <div class="row margin-5">
+                                        <div class="col-12 col-lg-4" id="address-city">
+                                            <div class="form-group">
+                                                @Html.LabelFor(c => NewCard.BillingAddress.City, new { @class = "d-block" })
+                                                @Html.TextBoxFor(c => NewCard.BillingAddress.City, new
+                                                {
+                                                    @class = "form-control",
+                                                    data_role = "City"
+                                                })
+                                                @Html.ValidationMessageFor(c => NewCard.BillingAddress.City)
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-lg-5" id="address-state">
+                                            <div class="form-group">
+                                                @Html.LabelFor(c => NewCard.BillingAddress.State, new { @class = "d-block" })
+                                                @Html.DropDownListFor(c => NewCard.BillingAddress.State,
+                                                    selectList: Html.Regions(defaultCountryCode, defaultRegionCode),
+                                                    htmlAttributes: new
+                                                    {
+                                                        @class = "form-control",
+                                                        id = Html.IdFor(c => NewCard.BillingAddress.State),
+                                                        data_role = "State"
+                                                    })
+                                                @Html.ValidationMessageFor(c => NewCard.BillingAddress.State)
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 col-lg-3">
+                                            <div class="form-group">
+                                                @Html.LabelFor(c => NewCard.BillingAddress.Zip, new { @class = "d-block" })
+                                                @Html.TextBoxFor(c => NewCard.BillingAddress.Zip, new
+                                                {
+                                                    @class = "form-control",
+                                                    data_role = "Zip"
+                                                })
+                                                @Html.ValidationMessageFor(c => NewCard.BillingAddress.Zip)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+                if (paymentMethod.CanBeParsedAs<BankAccount>())
+                {
+                    var ischecked = (paymentsCount == 1) ? "checked='checked'" : "";
+                    <div class="radio-wrapper content-box__row">
+                        <div class="radio__input">
+                            <input class="input-radio" id="" @ischecked name="">
+                        </div>
+
+                        <div class="radio__label  ">
+                            <label class="radio__label__primary content-box__emphasis">
+                                @Resources.Common.CheckingAccount
+                            </label>
+                            <div class="radio__label__accessory">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="" class="radio-wrapper content-box__row content-box__row--secondary card-fields-container card-fields-container--loaded card-fields-container--transitioned">
+                        <div id="newbankaccountcontainer" style="display: none;">
+                            @{ var NewBankAccount = new BankAccount(); }
+                            @using (Ajax.BeginForm("UseBankAccount", controller, new AjaxOptions()
+                            {
+                                OnBegin = "paymentoverview.onBegin",
+                                OnSuccess = "paymentoverview.onSuccess"
+                            }, new { novalidate = "novalidate" }))
+                            {
+                                @Html.AntiForgeryToken()
+
+                                <div class="card bg-light card-body mb-3">
+                                    <div class="row margin-5">
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                @Html.LabelFor(c => NewBankAccount.NameOnAccount)
+                                                @Html.TextBoxFor(c => NewBankAccount.NameOnAccount,
+                                                htmlAttributes: new
+                                                {
+                                                @class = "form-control"
+                                                })
+                                                @Html.ValidationMessageFor(c => NewBankAccount.NameOnAccount, String.Empty,
+                                                new
+                                                {
+                                                    @style = "color:red; font-size:small;"
+                                                })
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                @Html.LabelFor(c => NewBankAccount.BankName)
+                                                @Html.TextBoxFor(c => NewBankAccount.BankName,
+                                                htmlAttributes: new
+                                                {
+                                                @class = "form-control"
+                                                        })
+                                                @Html.ValidationMessageFor(c => NewBankAccount.BankName, String.Empty,
+                                                new
+                                                {
+                                                    @style = "color:red; font-size:small;"
+                                                })
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                @Html.LabelFor(c => NewBankAccount.AccountNumber)
+                                                @Html.TextBoxFor(c => NewBankAccount.AccountNumber,
+                                                htmlAttributes: new
+                                                {
+                                                @class = "form-control"
+                                                })
+                                                @Html.ValidationMessageFor(c => NewBankAccount.AccountNumber, String.Empty,
+                                                new
+                                                {
+                                                    @style = "color:red; font-size:small;"
+                                                })
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                @Html.LabelFor(c => NewBankAccount.RoutingNumber)
+                                                @Html.TextBoxFor(c => NewBankAccount.RoutingNumber,
+                                                htmlAttributes: new
+                                                {
+                                                @class = "form-control"
+                                                })
+                                                @Html.ValidationMessageFor(c => NewBankAccount.RoutingNumber, String.Empty,
+                                                new
+                                                {
+                                                    @style = "color:red; font-size:small;"
+                                                })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="custom-control custom-checkbox billingsameasshipping">
+                                        <input type="checkbox" class="custom-control-input" name="BillingSameAsShipping" id="BillingSameAsShipping" value="true" checked />
+                                        <label class="custom-control-label" for="BillingSameAsShipping">@Resources.Common.BillingAddressSameAsShipping</label>
+                                        <input type="hidden" value="false" name="BillingSameAsShipping" />
+                                    </div>
+                                    @Html.EditorFor(c => NewBankAccount.BillingAddress)
+                                </div>
+
+                            }
+                        </div>
+                    </div>
+                }
+                paymentsCount++;
+            }
+        </div>
+    </div>
+</div>
+
+<!-- END Pay with Points -->
+<a class="btn btn-primary float-right" style="margin-top:20px" id="PlaceOrderButton" data-loading-text="@Resources.Common.Saving">@Resources.Checkout.Payments_PlaceOrderButton</a>
+
+<script>
+    require(["jquery", 'mask'], function ($, mask) {
+        $("#NewCard_BillingAddress_Country").on("change", function () {
+            var val = $(this).val();
+            actions.populateStatesDropdown(val);
+        })
+    });
+
+        var actions = {
+            populateStatesDropdown: function (country) {
+                $.ajax({
+                    url: '@Url.Action("GetRegions", "App")',
+                    data: { id: country },
+                    success: function (response) {
+                        if (response.regions.length == 0) {
+                            $("#address-state").hide();
+                            $("#address-city").removeClass("col-lg-4");
+                            $("#address-city").addClass("col-lg-8");
+                        } else {
+                            $("#address-state").show();
+                            $("#address-city").removeClass("col-lg-8");
+                            $("#address-city").addClass("col-lg-4");
+                            var html = "";
+                            for (let i = 0; i < response.regions.length; i++) {
+                                var r = response.regions[i];
+                                html += '<option value="' + r.RegionCode + '">' + r.RegionName + '</option>';
+                            }
+                            $('#NewCard_BillingAddress_State').html(html);
+                        }
+                    }
+                })
+            }
+        }
+</script>
+@*<script src="@Url.Content("~/Scripts/exigopayments-1.0.0.js")"></script>*@
+<script src="@Url.Action("TokenEx", "App")"></script>
+<script>
+        var paymentoverview;
+
+        require(["jquery", "toastr", "pubsub", "forms", "bootstrap"], function ($, toastr) {
+            paymentoverview = (function () {
+                // Iframe width fix
+                var ccFieldWidth = "94%";
+
+                var tokenizer = new TokenExIframeClient("cc-wrapper", {
+                    styles: {
+                        base: "display: block; max-height: 40px; width: " + ccFieldWidth + ";padding: .375rem .75rem;font-size: 1rem;line-height: 1.5;color: #495057;background-color: #fff;background-clip: padding-box;border: 1px solid #ced4da;border-radius: .25rem;transition: border-color .15s ease-in -out, box-shadow .15s ease-in -out;margin: 0;font-family: inherit;",
+                        focus: "color: #495057;border: 1px solid #f6cac3;outline:none;",
+                        error: "@Resources.Checkout.Payments_CardInvalidMessage"
+                    }
+                });
+
+                // Settings
+                var context = "#view-orderpayment",
+                    $context = $(context),
+                    $pointsContainer = $('#pointTotal'),
+                    maxValue = @maxValue;
+
+
+                function registerEventHandlers() {
+
+                    $('input[type=radio][name="ShipMethodId"]').change(function () {
+                        var methodId = $(this).val();
+                        $.ajax({
+                            url: '@Url.Action("ChangeShipMethod")',
+                            data: { shipMethodId: methodId },
+                            type: "POST",
+                            success: function (response) {
+                                if (response.success) {
+                                    $(".orderTotal").html(response.orderTotal);
+                                    $(".shippingTotal").html(response.shippingTotal);
+                                    $(".totalPoints").html(response.pointsTotal);
+                                    $(".taxTotal").html(response.taxTotal);
+                                    $(".autoorderSubtotal").html(response.autoOrderSubTotal);
+                                } else {
+                                    toastr.error(Resources.Checkout.Payments_ShippingCalculationErrorMessage);
+                                }
+                            }
+                        });
+                    });
+                    $('input:checkbox[id=use-point-account]').change(function () {
+                        var $this = $(this),
+                            //hidePaymentMethodContainer = $this.hasClass("hide-payment-method-container"),
+                            checked = $this.is(':checked');
+                        var amount = $("#QuantityOfPoints").val();
+                        if (checked) {
+                            $("#pointTotal").show();
+                            actions.changePointAccountStatus(true, amount)
+                        } else {
+                            $("#pointTotal").hide();
+                            actions.changePointAccountStatus(false, amount)
+                        }
+                    });
+                    $('input[type=radio][name="PaymentMethod"]').change(function () {
+                        var methodId = $(this).val();
+                        $(".payment-radio").hide();
+                        if (methodId == "citconpayment") {
+                            var id = $(this).data("id");
+                            $("#" + id + "-container").show();
+                        } else {
+                            $("#" + methodId + "-container").show();
+                        }
+                    });
+                    $("#QuantityOfPoints").on("keyup", function () {
+                        var $This = $(this);
+
+                        console.log("$This.val()", $This.val());
+                        console.log("maxValue", maxValue);
+
+                        if ($This.val() > maxValue) {
+                            toastr.error("@Resources.Checkout.Payments_PointAccountToHighAmountMessage");
+                            $This.val(maxValue);
+                        }
+                    });
+                    $("#QuantityOfPoints").on("focusout", function () {
+                        var value = $(this).val();
+                        var status = $('#use-point-account').is(':checked');
+                        console.log("Change");
+                        actions.changePointAccountStatus(status,value);
+                    });
+                    $('[data-toggle]', $context).on('click', function () {
+                        var $this = $(this);
+                        var $target = $($(this).data('toggle'));
+                        $target.slideToggle('fast');
+
+                        $this.slideUp('fast');
+                    });
+
+                    $('input:checkbox[name="BillingSameAsShipping"]').on('change', function () {
+                        var $this = $(this),
+                            $target = $this.parents('.billingsameasshipping').siblings('.view-address'),
+                            checked = $this.is(':checked');
+
+                        if (checked) {
+                            $target.slideUp('fast');
+                        }
+                        else {
+                            $target.slideDown('fast');
+                        }
+                    });
+
+                    $('input:checkbox[name="BillingSameAsShipping"]').each(function () {
+                        $(this).triggerHandler('change');
+                    });
+
+
+                    $('#PlaceOrderButton').on('click', function () {
+                        var paymentType = $("#PaymentMethod:checked").val();
+                        if (paymentType == "creditcard") {
+                            actions.useCreditCard();
+                        } else if (paymentType == "Primary") {
+                            actions.usePrimaryCard();
+                        } else if (paymentType == "Secondary") {
+                            actions.useSecondaryCard();
+                        } else if (paymentType == "citconpayment") {
+                            var paymentId = $("#PaymentMethod:checked").data("id");
+                            actions.useCitconPayments(paymentId);
+                        }
+                    });
+                }
+
+                // Actions
+                var actions = {
+                    changePointAccountStatus: function (status, points) {
+                        var data = { payWithPoints: status, pointAmount: points }
+                        if (status == false || points == 0) {
+                            $(".total-line--points").hide();
+                        } else {
+                            $(".total-line--points").show();
+                        }
+                        $.ajax({
+                            url: '@Url.Action("ChangePointAccountPayment")',
+                            data: data,
+                            type: "POST",
+                            success: function (response) {
+                                if (response.success) {
+                                    console.log(response);
+                                    $(".orderTotal").html(response.orderTotal);
+                                    $(".shippingTotal").html(response.shippingTotal);
+                                    $(".pointsTotal").html(response.pointsTotal);
+                                    $(".taxTotal").html(response.taxTotal);
+                                }
+                            }
+                        });
+                    },
+                    submitOrder: function () {
+                        $.ajax({
+                            url: '@Url.Action("SubmitCheckout")',
+                            type: "POST",
+                            success: function (response) {
+                                if (response.success) {
+                                    console.log(response);
+                                    window.location = response.redirectUrl
+                                } else {
+                                    $("#place-order-modal").modal('hide');
+                                    toastr.error(response.message)
+                                }
+                            }
+                        })
+                    },
+                    useCreditCard: function () {
+                        var $form = $("#creditcardForm");
+
+                        // Get Credit Card Token here
+                        tokenizer.tokenize({
+                            success: function (data) {
+
+                                var token = data.token;
+                                $(".creditcard-token").val(token);
+                                $(".creditcard-display").val(token.substr(token.length - 4, 4))
+                                $form.submit();
+                            },
+                            error: function (data) {
+                                toastr.error(data);
+                                $("#place-order-modal").modal('hide');
+                                return;
+                            }
+                        });
+                    },
+                    usePrimaryCard: function () {
+                        var $form = $("#PrimaryForm");
+                        $form.submit();
+                    },
+                    useSecondaryCard: function () {
+                        var $form = $("#SecondaryForm");
+                        $form.submit();
+                    },
+                    useCitconPayments: function (id) {
+                        var $form = $("#" + id + "form");
+                        $form.submit();
+                    },
+                    onBegin: function () {
+
+                        $('#place-order-modal').modal({
+                            backdrop: 'static',
+                            keyboard: false
+                        })
+                        $("#place-order-modal").modal('show');
+                        toastr.clear();
+                    },
+                    onSuccess: function (response) {
+                        if (response.success) {
+                            actions.submitOrder();
+                            //alert("Success");
+                        } else {
+                            toastr.error(response.message);
+                            $("#place-order-modal").modal('hide');
+                        }
+                    }
+                };
+
+                // Initialization
+                function init() {
+                    registerEventHandlers();
+
+                }
+                init();
+
+                return {
+                    onSuccess: actions.onSuccess,
+                    onBegin: actions.onBegin
+                }
+
+            })();
+        });
+</script>

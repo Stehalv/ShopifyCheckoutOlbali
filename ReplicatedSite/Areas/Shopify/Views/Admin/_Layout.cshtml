@@ -1,0 +1,45 @@
+﻿@using ReplicatedSite;
+@{ 
+
+    Layout = "~/Areas/shopify/Views/Shared/_Layout.cshtml";
+}  
+<style>
+    #sub-menu {
+        height: 100vh;
+        background-color: #f6f6f7;
+        border-right: 1px solid #8c9196;
+    }
+
+</style>
+<div id="sub-menu" class="col-md-2">
+    <h3>Admin</h3>
+    <ul>
+        <li>
+            <a href="@Url.Action("Index")">Settings</a>
+        </li>
+        <li>
+            <a href="@Url.Action("Markets")">Markets</a>
+        </li>
+        <li>
+            <a href="@Url.Action("Integrations")">Integrations</a>
+        </li>
+        <li>
+            <a href="@Url.Action("Jobs")">Jobs</a>
+        </li>
+    </ul>
+    <hr />
+    <ul>
+        @if (ShopifyApp.Settings.IsAdmin(Identity.Current.UserRole))
+        {
+            <li>
+                <a href="@Url.Action("Create", "TenantOrderConfigurations")">Add market</a>
+            </li>
+            <li>
+                <a href="@Url.Action("Create", "TenantConfigurations")">Add integration</a>
+            </li>
+        }
+    </ul>
+</div>  
+<div id="content" class="col-md-10">
+    @RenderBody()
+</div>

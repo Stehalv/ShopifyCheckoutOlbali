@@ -1,0 +1,39 @@
+﻿@using ReplicatedSite;
+@{ 
+
+    Layout = "~/Areas/Shopify/Views/Shared/_Layout.cshtml";
+}  
+<style>
+    #sub-menu {
+        height: 100vh;
+        background-color: #f6f6f7;
+        border-right: 1px solid #8c9196;
+    }
+
+</style>
+<div id="sub-menu" class="col-md-2">
+    <h3>Integration</h3>
+    <ul>
+        <li>
+            <a href="@Url.Action("Details", new { id = ViewBag.Id })">Details</a>
+        </li>
+        <li>
+            <a href="@Url.Action("Index", "Product", new { tenantConfigId = ViewBag.Id })">Products</a>
+        </li>
+        <li>
+            <a href="@Url.Action("Webhooks", new { id = ViewBag.Id })">Webhooks</a>
+        </li>
+        <li>
+            <a href="@Url.Action("Pricerules", new { id = ViewBag.Id })">Pricerules</a>
+        </li>
+        @if (ShopifyApp.Settings.IsSystemAdmin(Identity.Current.UserRole))
+        {
+            <li>
+                <a href="@Url.Action("Advanced", new { id = ViewBag.Id })">Advanced</a>
+            </li>
+        }
+    </ul>
+</div>  
+<div id="content" class="col-md-10">
+    @RenderBody()
+</div>

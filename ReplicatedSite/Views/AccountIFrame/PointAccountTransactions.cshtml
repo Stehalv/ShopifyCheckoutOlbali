@@ -1,0 +1,61 @@
+﻿@model PointAccountTransactionsViewModel
+@{
+    ViewBag.Title = "Point Account Transactions";
+}
+
+<div id="view-point-account-transactions">
+
+    <div class="content-wrap">
+        <div class="container">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">Point Account</div>
+                        <div class="col-6">@Model.PointAccountDescription</div>
+                        <div class="col-6">Point Balance</div>
+                        <div class="col-6">@Model.PointAccountBalance.ToString("C")</div>
+                    </div>
+                </div>
+            </div>
+            <div class="space-20"></div>
+            <div class="card">
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Transaction Date</th>
+                                <th>Points</th>
+                                <th>Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Transactions.Count() > 0)
+                            {
+
+                                foreach (var item in Model.Transactions)
+                                {
+                                    <tr>
+                                        <td>@item.TransactionDate.ToShortDateString()</td>
+                                        <td>@item.Points.ToString("C")</td>
+                                        <td>@item.Reason</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="3">
+                                        <h3 class="text-center">
+                                            @Resources.Common.NoResults
+                                        </h3>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

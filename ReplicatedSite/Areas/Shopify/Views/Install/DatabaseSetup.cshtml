@@ -1,0 +1,56 @@
+﻿@model ShopifyApp.Models.DatabaseSetup
+
+@{
+    ViewBag.Title = "Database";
+    Layout = "~/Areas/Shopify/Views/Shared/_LoginLayout.cshtml";
+}
+
+<div class="form-horizontal" style="margin-top:120px;">
+    <h4>Install Database</h4>
+    <hr />
+    @if (Model.whitelisted)
+    {
+        <div class="row form-group">
+            <div class="col-md-6">
+                <table style="width:100%">
+                    <thead>
+                        <tr style="font-weight:bolder">
+                            <td>Name</td>
+                            <td>Exsits</td>
+                            <td>Action</td>
+                        </tr>
+                    </thead>
+                    @foreach (var table in Model.Tables)
+                    {
+                        <tr>
+                            <td>@table.Name</td>
+                            <td>@table.Exists.ToString()</td>
+                            <td>
+                                @if (!table.Exists)
+                                {
+                                    <a href="@Url.Action("CreateEntity", "Install", new { name = table.Name })">create</a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        </div>
+        if (!Model.AdminUserCreated)
+        {
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <a href="@Url.Action("CreateAdminUser", "Install")" class="btn btn-primary">Create AdminUser</a>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="row form-group">
+            <div class="col-md-6">
+                <h2>Before you can continue, make sure this ip is whitelisted in exigo admin: @Model.IP</h2>
+            </div>
+        </div>
+    }
+</div>

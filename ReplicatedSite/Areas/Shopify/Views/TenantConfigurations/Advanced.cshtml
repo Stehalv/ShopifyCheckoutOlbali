@@ -1,0 +1,12 @@
+﻿@using ReplicatedSite;
+@model ReplicatedSite.Areas.Shopify.ViewModels.TenantConfigurationViewModel
+
+@{
+    ViewBag.Title = "Advanced";
+    Layout = "~/Areas/Shopify/Views/TenantConfigurations/_Layout.cshtml";
+}
+@if (ShopifyApp.Settings.IsSystemAdmin(Identity.Current.UserRole))
+{
+    <h3>Advanced</h3>
+    <span>Reset all Orders, Customers and data(Advanced):  </span> <a href="@Url.Action("CleanInstance", "TenantConfigurations", new { configId = Model.Config.Id })">Clean Instance</a>
+}

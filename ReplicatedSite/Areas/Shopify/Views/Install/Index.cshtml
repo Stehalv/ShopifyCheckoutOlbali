@@ -1,0 +1,89 @@
+﻿@model ShopifyApp.Models.SettingsModel
+
+@{
+    ViewBag.Title = "FirstInstall";
+    Layout = "~/Areas/Shopify/Views/Shared/_LoginLayout.cshtml";
+}
+
+<h2>View</h2>
+
+@using (Html.BeginForm("UpdateConnectionString", "install"))
+{
+    @Html.AntiForgeryToken()
+    
+<div class="form-horizontal">
+    <h4>First setup of Shopify App</h4>
+    <hr />
+    @if (Model.ErrorMessage.IsNotNullOrEmpty())
+    {
+        <h2 style="color:red">@Model.ErrorMessage</h2>
+        <hr />
+    }
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.CompanyName, htmlAttributes: new { @class = "control-label col-md-3" })
+        <div class="col-md-9">
+            @Html.EditorFor(model => model.CompanyName, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.CompanyName, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.DatabaseContext, htmlAttributes: new { @class = "control-label col-md-3" })
+        <div class="col-md-9">
+            @Html.EditorFor(model => model.DatabaseContext, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.DatabaseContext, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    @*<div class="form-group">
+            @Html.LabelFor(model => model.DeleteProcessedWebhooks, htmlAttributes: new { @class = "control-label col-md-3" })
+            <div class="col-md-9">
+                <div class="checkbox">
+                    @Html.EditorFor(model => model.DeleteProcessedWebhooks)
+                    @Html.ValidationMessageFor(model => model.DeleteProcessedWebhooks, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.DefaultTenantConfig, htmlAttributes: new { @class = "control-label col-md-3" })
+            <div class="col-md-9">
+                @Html.EditorFor(model => model.DefaultTenantConfig, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.DefaultTenantConfig, "", new { @class = "text-danger" })
+            </div>
+        </div>*@
+
+
+
+    @*<div class="form-group">
+            @Html.LabelFor(model => model.DefaultEnrollerID, htmlAttributes: new { @class = "control-label col-md-3" })
+            <div class="col-md-9">
+                @Html.EditorFor(model => model.DefaultEnrollerID, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.DefaultEnrollerID, "", new { @class = "text-danger" })
+            </div>
+        </div>*@
+
+    @*<div class="form-group">
+            @Html.LabelFor(model => model.DefaultWebalias, htmlAttributes: new { @class = "control-label col-md-3" })
+            <div class="col-md-9">
+                @Html.EditorFor(model => model.DefaultWebalias, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.DefaultWebalias, "", new { @class = "text-danger" })
+            </div>
+        </div>*@
+    @*<div class="form-group">
+            @Html.LabelFor(model => model.AppUrl, htmlAttributes: new { @class = "control-label col-md-3" })
+            <div class="col-md-9">
+                @Html.EditorFor(model => model.AppUrl, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.AppUrl, "", new { @class = "text-danger" })
+            </div>
+        </div>*@
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Save" class="btn btn-default" />
+        </div>
+    </div>
+</div>
+}

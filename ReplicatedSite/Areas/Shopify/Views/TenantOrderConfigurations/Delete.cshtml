@@ -1,0 +1,98 @@
+﻿@model ShopifyApp.Models.TenantOrderConfiguration
+
+@{
+    ViewBag.Title = "Delete";
+    Layout = "~/Areas/Shopify/Views/TenantOrderConfiguration/_Layout.cshtml";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>TenantOrderConfiguration</h4>
+    <hr />
+    <dl class="dl-horizontal">
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ConnectionString)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ConnectionString)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.WarehouseID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.WarehouseID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.PriceTypeID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.PriceTypeID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CurrencyCode)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CurrencyCode)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.LanguageID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.LanguageID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DefaultCountryCode)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DefaultCountryCode)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DefaultShipMethodID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DefaultShipMethodID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CategoryID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CategoryID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.FeaturedCategoryID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.FeaturedCategoryID)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn btn-default" /> |
+            @Html.ActionLink("Back to List", "Index", "Home")
+        </div>
+    }
+</div>

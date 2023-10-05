@@ -1,0 +1,95 @@
+﻿@using ReplicatedSite;
+@model ReplicatedSite.Areas.Shopify.ViewModels.TenantConfigurationViewModel
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Areas/Shopify/Views/TenantConfigurations/_Layout.cshtml";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>TenantConfiguration</h4>
+    <hr />
+    <dl class="dl-horizontal">
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Config.ShopUrl)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Config.ShopUrl)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Config.LocationId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Config.LocationId)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Config.ShopApiKey)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Config.ShopApiKey)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Config.ShopSecret)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Config.ShopSecret)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Config.DefaultEnrollerID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Config.DefaultEnrollerID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Config.DefaultEnrollerWebAlias)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Config.DefaultEnrollerWebAlias)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Config.UseSandbox)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Config.UseSandbox)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Config.SandBoxId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Config.SandBoxId)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Config.AuthenticationToken)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Config.AuthenticationToken)
+        </dd>
+
+    </dl>
+</div>
+
+<p style="margin-top:30px;">
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Config.Id }) |
+    @Html.ActionLink("Back", "Index", "Home")
+</p>
+

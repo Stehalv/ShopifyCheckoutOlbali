@@ -1,0 +1,119 @@
+﻿@model CustomerStatusViewModel
+@{ 
+    Layout = "~/views/shared/_emptylayout.cshtml";
+}
+<div class="container">
+    <div class="section" style="margin-top:20px;">
+        <div class="section__header">
+            <div class="layout-flex layout-flex--tight-vertical layout-flex--loose-horizontal layout-flex--wrap">
+                <h2 class="section__title layout-flex__item layout-flex__item--stretch">
+                    LOG
+                </h2>
+            </div>
+        </div>
+        <div class="section__content">
+            @foreach (var message in Model.Log)
+            {
+                <div class="row">
+                    <div class="col-sm-12">
+                        @message
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="section" style="margin-top:20px;">
+        <div class="section__header">
+            <div class="layout-flex layout-flex--tight-vertical layout-flex--loose-horizontal layout-flex--wrap">
+                <h2 class="section__title layout-flex__item layout-flex__item--stretch">
+                    Status
+                </h2>
+            </div>
+        </div>
+        <div class="section__content">
+            <div class="row">
+                <div class="col-sm-4">
+                    Correct Exigo ID:
+                </div>
+                <div class="col-sm-4">
+                    @if (Model.ExigoCustomer.CustomerID == Model.Customer.ExigoCustomerId)
+                    {
+                        <span>YES</span>
+                    }
+                    else
+                    {
+                        <span>NO</span>
+                    }
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-4">
+                    Correct Shopify ID:
+                </div>
+                <div class="col-sm-4">
+                    @if (Model.ShopifyCustomer.Id.Value.ToString() == Model.Customer.ShopCustomerId)
+                    {
+                        <span>YES</span>
+                    }
+                    else
+                    {
+                        <span>NO</span>
+                    }
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-4">
+                    Same Email in Exigo and shopify:
+                </div>
+                <div class="col-sm-4">
+                    @if (Model.ShopifyCustomer.Email.ToLower() == Model.ExigoCustomer.Email.ToLower())
+                    {
+                        <span>YES</span>
+                    }
+                    else
+                    {
+                        <span>NO</span>
+                    }
+                </div>
+            </div>
+            @if (Model.ActivationLink.IsNotNullOrEmpty())
+            {
+                <div class="row">
+                    <div class="col-sm-4">
+                        Shopify Activation Link:
+                    </div>
+                    <div class="col-sm-4">
+                        <a href="@Model.ActivationLink" target="_blank">@Model.ActivationLink</a>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="row">
+                    <div class="col-sm-4">
+                        Shopify Account Status:
+                    </div>
+                    <div class="col-sm-4">
+                        @Model.ShopifyCustomer.State.ToString()
+                    </div>
+                </div>
+            }
+            <div class="row">
+                <div class="col-sm-6">
+                    Shopify Admin:
+                </div>
+                <div class="col-sm-4">
+                    <a href="@GlobalSettings.ReplicatedSites.ShopUrl/admin/customers/@Model.Customer.ShopCustomerId" target="_blank">Go to customer Shopify admin page</a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    Test silent login token:
+                </div>
+                <div class="col-sm-4">
+                    <a href="https://@GlobalSettings.Company.BaseBackofficeUrl/silentloginshopify?token=@Model.Customer.SilentLoginToken" target="_blank">Log in</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

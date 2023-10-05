@@ -1,0 +1,67 @@
+﻿@model ReplicatedSite.Areas.Shopify.ViewModels.ProductListViewModel
+
+@{
+    ViewBag.Title = "Exigo Items";
+    Layout = "~/Areas/Shopify/Views/Shared/_Layout.cshtml";
+}
+<style>
+    #sub-menu {
+        height: 100vh;
+        background-color: #f6f6f7;
+        border-right: 1px solid #8c9196;
+    }
+</style>
+<div id="sub-menu" class="col-md-2">
+    <h2>Shopify Products</h2>
+    <ul>
+        <li>
+            <a href="@Url.Action("index", new { id = ViewBag.configId })">Shopify Products</a>
+        </li>
+        <li>
+            <a href="@Url.Action("SyncAllShopPricing", new { id = ViewBag.ConfigId })">Sync prices</a>
+        </li>
+    </ul>
+</div>
+<div id="content" class="col-md-10"><div class="row text-center" style="margin-bottom:20px;">
+    <div class="col-xs-4 text-right">
+        @if (Model.PreviousFilter.IsNotNullOrEmpty())
+        {
+            <a href="@Url.Action("Index", "Product", new { tenantConfigId = ViewBag.ConfigId, pageInfo = Model.PreviousFilter })"><< Previous </a>
+        }
+    </div>
+    <div class="col-xs-4 text-center">
+    </div>
+    <div class="col-xs-4 text-left">
+        @if (Model.NextFilter.IsNotNullOrEmpty())
+        {
+            <a href="@Url.Action("Index", "Product", new { tenantConfigId = ViewBag.ConfigId, pageInfo = Model.NextFilter })">Next >> </a>
+        }
+    </div>
+</div>
+    <div class="row">
+        <div class="col-11 col-xs-offset-1">
+            <table width="100%">
+                <thead>
+                    <tr>
+                        <th colspan="2">Description</th>
+                        <th>In Sync</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                    <tr>
+                        <td colspan="2">@item.Title</td>
+                        <td ></td>
+                        <td>
+                            <a href="@Url.Action("ProductDetails", "Product", new { id = item.Id, configId = ViewBag.ConfigId })">Details</a>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+

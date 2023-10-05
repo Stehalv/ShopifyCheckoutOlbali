@@ -1,0 +1,54 @@
+﻿@model ReplicatedSite.ViewModels.LoginViewModel
+@{
+    Layout = "~/Areas/Shopify/Views/Shared/_LoginLayout.cshtml";
+    ViewBag.Title = Resources.Common.Login;
+    var hasReturnURL = (Request["ReturnUrl"] != null) ? true : false;
+    var returnUrl = "";
+    if (hasReturnURL)
+    {
+        returnUrl = Request["ReturnUrl"];
+    }
+
+    var hasCustomerTypeID = (Request["CustomerType"] != null) ? true : false;
+
+    var customerType = 0;
+
+    if (hasCustomerTypeID)
+    {
+        customerType = Convert.ToInt32(Request["CustomerType"]);
+    }
+
+    var createAccountUrl = (hasReturnURL) ? Url.Action("register", "account", new { ReturnUrl = returnUrl }) : Url.Action("register", "account");
+
+
+
+    if(hasCustomerTypeID)
+    {
+        createAccountUrl += "&CustomerTypeID=" + customerType;
+    }
+
+}
+
+<div id="view-account-login" style="margin-top:60px;">
+    <div class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-6 col-sm-offset-3">
+                    @using (Html.BeginForm())
+                    {
+                        <div class="form-group">
+                            @Html.LabelFor(c => c.LoginName)
+                            @Html.TextBoxFor(c => c.LoginName, new { @class = "form-control" })
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(c => c.LoginPassword)
+                            @Html.PasswordFor(c => c.LoginPassword, new { @class = "form-control" })
+                        </div>
+                        <button type="submit" id="loginbutton" data-loading-text="@Resources.Common.Loading" class="btn btn-primary">@Resources.Common.SignIn</button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

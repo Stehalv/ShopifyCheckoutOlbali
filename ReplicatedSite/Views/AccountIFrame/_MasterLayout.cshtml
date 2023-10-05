@@ -1,0 +1,524 @@
+﻿@{
+    #region Properties
+    // Market and Language properties
+    var availableMarkets = GlobalSettings.Markets.AvailableMarkets;
+    var availableLanguages = ExigoDAL.GetLanguages();
+    var selectedMarket = GlobalUtilities.GetCurrentMarket(this.Context);
+    var selectedCountry = CommonResources.Countries(selectedMarket.MainCountry);
+    var selectedLanguage = GlobalUtilities.GetSelectedLanguage(this.Context, selectedMarket.AvailableLanguages.First().CultureCode, selectedMarket);
+    var isEnrollment = ViewContext.RouteData.Values["controller"].ToString().ToLower().Contains("enrollment");
+    var countryHiddenClass = (availableMarkets.Count > 1) ? "" : "hidden";
+    var languageHiddenClass = (availableLanguages.Count() > 1) ? "" : "hidden";
+    var modalHeaderText = "";
+
+    if (availableMarkets.Count > 1 && availableLanguages.Count() > 1)
+    {
+        modalHeaderText = Resources.Common.SelectCountLang;
+    }
+    else if (availableMarkets.Count > 1)
+    {
+        modalHeaderText = Resources.Common.SelectCountry;
+    }
+    else
+    {
+        modalHeaderText = Resources.Common.SelectLanguage;
+    }
+    #endregion
+}
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html lang="en" class="lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html lang="en" class="lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html lang="en" class="lt-ie9"> <![endif]-->
+<!--[if IE 9]>         <html lang="en" class="ie9"> <![endif]-->
+<html lang="en" data-scroll="0">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no">
+    <meta name="mobileoptimized" content="0" />
+    <meta name="published" content="@MvcApplication.ApplicationStartDate" />
+
+
+    @if (ViewBag.Title != null && ViewBag.Title != "")
+    {
+
+        <title>@ViewBag.Title - @Resources.Common.CompanyName</title>
+    }
+    else
+    {
+        <title>@Resources.Common.CompanyName</title>
+
+    }
+
+
+    <link rel="app" id="apppath" href="@Request.ApplicationPath" />
+    <link rel="app" id="appauthenticated" href="@Request.IsAuthenticated.ToString()" />
+    <link rel="app" id="appsessiontimeout" href="@GlobalSettings.ReplicatedSites.SessionTimeout" />
+
+    <link rel="shortcut icon" href="~/Content/images/lab-icon.png" type="image/x-icon" />
+    <link rel="apple-touch-icon" href="~/Content/images/lab-icon.png" />
+    <link rel="apple-touch-icon" sizes="57x57" href="~/Content/images/lab-icon.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="~/Content/images/lab-icon.png" />
+    <link rel="apple-touch-icon" sizes="76x76" href="~/Content/images/lab-icon.png" />
+    <link rel="apple-touch-icon" sizes="114x114" href="~/Content/images/lab-icon.png" />
+    <link rel="apple-touch-icon" sizes="120x120" href="~/Content/images/lab-icon.png" />
+    <link rel="apple-touch-icon" sizes="144x144" href="~/Content/images/lab-icon.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="~/Content/images/lab-icon.png" />
+    @* Styles *@
+
+    @*<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet" />*@
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700|Raleway:300,400,500,600,700|Crete+Round:400i" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/timepicker@1.11.15/jquery.timepicker.css" />
+    @Styles.Render("~/bundles/styles/vendor")
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/flick/jquery-ui.css" />
+    <link href="~/Content/styles/vendor/Bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/styles/landb.css?v=@Settings.StyleVersionNumber" rel="stylesheet" />
+    <link href="~/Content/styles/ShopifyAccount.css?v=@Settings.StyleVersionNumber" rel="stylesheet" />
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" integrity="sha256-FdatTf20PQr/rWg+cAKfl6j4/IY3oohFAJ7gVC3M34E=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" />
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/kenwheeler/slick@1.8.1/slick/slick-theme.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" />
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/&#64;splidejs/splide-extension-video@latest/dist/css/splide-extension-video.min.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" integrity="sha256-FdatTf20PQr/rWg+cAKfl6j4/IY3oohFAJ7gVC3M34E=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/&#64;ttskch/select2-bootstrap4-theme/dist/select2-bootstrap4.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.2/toastr.min.css" rel="stylesheet">
+    @*<link href="~/Content/styles/components/_style.min.css" rel="stylesheet" />*@
+
+    @RenderSection("styles", required: false)
+    @* Scripts *@
+    <script src="@RouteJs.RouteJsHandler.HandlerUrl"></script>
+    <script src="@Url.Action("culture", "app" )"></script>
+    <!-- RequireJS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.20/require.min.js" data-main="@Url.Content(" ~/Content/scripts/main.js")"></script>
+    <script>
+        require.config({
+            baseUrl: '/Content/scripts',
+            waitSeconds: 60,
+            @if (HttpContext.Current.IsDebuggingEnabled) { <text>urlArgs: "bust=" + (new Date()).getTime(),</text> }
+            paths: {
+                'main': 'main',
+                'addresses': 'modules/addresses.min',
+                'app': 'modules/app.min',
+                'ajax': 'modules/ajax.min',
+                'browser': 'modules/browser.min',
+                'calendars': 'modules/calendars.min',
+                'console': 'modules/console.min',
+                'containers': 'modules/containers.min',
+                'cookies': 'modules/cookies.min',
+                'debug': 'modules/debug.min',
+                'encryptions': 'modules/encryptions.min',
+                'extensions': 'modules/extensions.min',
+                'forms': 'modules/forms.min',
+                'guids': 'modules/guids.min',
+                'idletimeout': 'modules/idletimeout.min',
+                'kendogrids': 'modules/kendogrids.min',
+                'passwords': 'modules/passwords.min',
+                'popups': 'modules/popups.min',
+                'pubsub': 'modules/pubsub.min',
+                'shopping': 'modules/shopping',
+                'urls': 'modules/urls.min',
+                'widgets': 'modules/widgets.min',
+                'handlebars': '@Scripts.Url("~/bundles/scripts/handlebars")',
+                // OLD FROM CDN
+                //'jquery': 'https://code.jquery.com/jquery-1.11.3.min',
+                // Local
+                'jquery': 'vendor/jquery-3.3.1.min',
+                //'jquery': 'vendor/jquery-1.11.3.min',
+                'bootstrap': 'https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min',
+                'jquery-ui': 'https://code.jquery.com/ui/1.12.1/jquery-ui.min',
+                'bootstrap-hover-dropdown': 'vendor/bootstrap-hover-dropdown.min',
+                'jquery-validate': 'vendor/jquery.validate.min',
+                'jquery-validate-unobtrusive': 'vendor/jquery.validate.unobtrusive.min',
+                'jquery-validate-unobtrusive-custom': 'vendor/jquery.validate.unobtrusive.custom.min',
+                'jquery-unobtrusive-ajax': 'vendor/jquery.unobtrusive-ajax.min',
+                'jquery-sumoselect': 'vendor/jquery.sumoselect.min',
+                'kendo': 'vendor/kendo/scripts/kendo.web.min',
+                'kendo-cultures': 'vendor/kendo/scripts/kendo.culture.min',
+                'mask': 'vendor/jquery.mask.min',
+                'moment': 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment-with-locales.min',
+                'tinymce': '//cdn.tinymce.com/4/tinymce.min',
+
+                @* theme requireses *@
+                'animsition': 'modules/animsition.min',
+
+                //new view javascript files
+                'timepicker': 'https://cdn.jsdelivr.net/npm/timepicker@1.11.15/jquery.timepicker.min',
+                'toastr': 'https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.2/toastr.min',
+            },
+        shim: {
+            'bootstrap': {
+                deps: ["jquery", "jquery-ui", 'bootstrap-hover-dropdown']
+            },
+            'jquery-validate-unobtrusive': {
+                deps: ['jquery-validate']
+            },
+            'jquery-unobtrusive-ajax': {
+                deps: ['jquery']
+            },
+            'jquery-sumoselect': {
+                deps: ['jquery']
+            },
+            'toastr': {
+                deps: ['jquery']
+            },
+            'handlebars': {
+                exports: 'Handlebars'
+            },
+            'animsition': {
+                deps: ['jquery']
+            }}
+        },
+        deps: ["bootstrap", "extensions", "forms"]
+        });
+    </script>
+    <!--[if lt IE 9]>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    @RenderSection("header", required: false)
+    @if (!GlobalSettings.ReplicatedSites.GoogleAnalyticsWebPropertyID.IsNullOrEmpty())
+    {
+        <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', '@GlobalSettings.ReplicatedSites.GoogleAnalyticsWebPropertyID', 'auto');
+      ga('send', 'pageview');
+
+        </script>
+    }
+</head>
+<body onLoad="resize();" data-loader="2" data-loader-color="red">
+
+
+
+    <div class="Polaris-Frame_2qi9y Polaris-Frame--hasNav_wlvjn Polaris-Frame--hasTopBar_1162r" data-polaris-layer="true" data-has-navigation="true">
+        <div class="Polaris-Frame__Skip_yj7bt">
+            <a href="#AppFrameMain">Gå videre til innholdet</a>
+        </div>
+        <div class="Polaris-Frame__TopBar_z6tf9" data-polaris-layer="true" data-polaris-top-bar="true" id="AppFrameTopBar">
+            <div class="">
+                <div>
+                    <div class="Polaris-TopBar_z6tf9">
+                        <button type="button" class="Polaris-TopBar__NavigationIcon_1bdcy" aria-label="Aktiver/deaktiver meny">
+                            <div class="Polaris-TopBar__IconWrapper_1kb6z">
+                                <span class="Polaris-Icon_yj27d"><span class="Polaris-VisuallyHidden_yrtt5"></span><svg viewBox="0 0 20 20" class="Polaris-Icon__Svg_375hu" focusable="false" aria-hidden="true"><path d="M19 11h-18a1 1 0 0 1 0-2h18a1 1 0 1 1 0 2zm0-7h-18a1 1 0 0 1 0-2h18a1 1 0 1 1 0 2zm0 14h-18a1 1 0 0 1 0-2h18a1 1 0 0 1 0 2z"></path></svg></span>
+                            </div>
+                        </button>
+                        <div class="Polaris-TopBar__LogoContainer_szav1 Polaris-TopBar__LogoDisplayControl_upvcc">
+                            <a data-polaris-unstyled="true" class="Polaris-TopBar__LogoLink_eekya" href="/admin" style="width: 100px;"><img alt="Shopify" src="https://cdn.shopify.com/shopifycloud/web/assets/v1/ddb1b8f869635189628e601ff2cfd30ec7bcf16ae0d16e18ccaf0949e205474a.svg" class="Polaris-TopBar__Logo_yj38q" style="width: 100px;"></a>
+                        </div>
+                        <div class="Polaris-TopBar__Contents_1u1wn">
+                            <div class="Polaris-TopBar__SearchField_ek145">
+                                <div>
+                                    <button type="button" class="Kq5q1"><span class="cTtDT"><span class="Polaris-Icon_yj27d"><span class="Polaris-VisuallyHidden_yrtt5"></span><svg viewBox="0 0 20 20" class="Polaris-Icon__Svg_375hu" focusable="false" aria-hidden="true"><path d="M8 12a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm9.707 4.293-4.82-4.82a5.968 5.968 0 0 0 1.113-3.473 6 6 0 0 0-12 0 6 6 0 0 0 6 6 5.968 5.968 0 0 0 3.473-1.113l4.82 4.82a.997.997 0 0 0 1.414 0 .999.999 0 0 0 0-1.414z"></path></svg></span></span><span class="zDkMR" title="Søk">Søk</span></button>
+                                </div>
+                            </div>
+                            <div class="Polaris-TopBar__SecondaryMenu_7y4ay">
+                                <div class="WQAz1">
+                                    <div class="SZ91S">
+                                        <button type="button" class="jXxiw" aria-label="Veiledning til oppsett">
+                                            <div class="Ge7ni">
+                                                <div class="rS8ld">
+                                                    <span class="Polaris-Icon_yj27d Polaris-Icon--colorHighlight_2qv4t Polaris-Icon--applyColor_2y25n"><span class="Polaris-VisuallyHidden_yrtt5"></span><svg viewBox="0 0 20 20" class="Polaris-Icon__Svg_375hu" focusable="false" aria-hidden="true"><path d="M3.249 2.001h13.868a.5.5 0 0 1 .428.758l-2.545 4.241 3.35 4.188a.5.5 0 0 1-.39.812l-12.49.001 1.507 6.782a1 1 0 1 1-1.953.434l-4-18a1 1 0 0 1 1.953-.434l.272 1.218z"></path></svg></span>
+                                                </div>
+                                                <p>Veiledning til oppsett</p>
+                                            </div>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="Polaris-TopBar-Menu__ActivatorWrapper_1gxxh">
+                                    <button type="button" class="Polaris-TopBar-Menu__Activator_e3w0d" tabindex="0" aria-controls="Polarispopover2" aria-owns="Polarispopover2" aria-expanded="false">
+                                        <div class="Polaris-MessageIndicator__MessageIndicatorWrapper_152yb">
+                                            <span aria-label="Avatar med initialene S H" role="img" class="Polaris-Avatar_z763p Polaris-Avatar--sizeSmall_7647q Polaris-Avatar--styleFour_16hgi"><span class="Polaris-Avatar__Initials_5s4f1"><svg class="Polaris-Avatar__Svg_375hu" viewBox="0 0 40 40"><text x="50%" y="50%" dy="0.35em" fill="currentColor" font-size="20" font-weight="400" text-anchor="middle">SH</text></svg></span></span>
+                                        </div>
+                                        <span class="Polaris-TopBar-UserMenu__Details_1bdkj">
+                                            <p class="Polaris-TopBar-UserMenu__Name_yisp9">Steinar Halvorsen</p>
+                                            <p class="Polaris-TopBar-UserMenu__Detail_nhg1f"></p>
+                                        </span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div aria-label="Navigasjon" class="Polaris-Frame__Navigation_1ajsq" id="AppFrameNav">
+                <div class="">
+                    <nav class="Polaris-Navigation_1ajsq">
+                        <div class="Polaris-Navigation__LogoContainer_szav1">
+                            <a data-polaris-unstyled="true" class="Polaris-Navigation__LogoLink_eekya" href="/admin" style="width: 100px;"><img alt="Shopify" src="https://cdn.shopify.com/shopifycloud/web/assets/v1/ddb1b8f869635189628e601ff2cfd30ec7bcf16ae0d16e18ccaf0949e205474a.svg" class="Polaris-Navigation__Logo_yj38q" style="width: 100px;"></a>
+                        </div>
+                        <div class="Polaris-Navigation__PrimaryNavigation_1i4zc Polaris-Scrollable_1ed9o Polaris-Scrollable--vertical_uiuuj" data-polaris-scrollable="true">
+                            <div class="rBYAB">
+                                <ul class="Polaris-Navigation__Section_1b1h1">
+                                    <li class="Polaris-Navigation__ListItem_wxd2m">
+                                        <div class="Polaris-Navigation__ItemWrapper_1kbav">
+                                            <a data-polaris-unstyled="true" class="Polaris-Navigation__Item_yiyol" tabindex="0" aria-disabled="false" href="/admin">
+                                                <div class="Polaris-Navigation__Icon_yj27d">
+                                                    <span class="Polaris-Icon_yj27d"><span class="Polaris-VisuallyHidden_yrtt5"></span><svg viewBox="0 0 20 20" class="Polaris-Icon__Svg_375hu" focusable="false" aria-hidden="true"><path d="M10.555 3.168a1 1 0 0 0-1.11 0l-5.554 3.702a2 2 0 0 0-.891 1.665v6.465a2 2 0 0 0 2 2h2a1 1 0 0 0 1-1v-4h4v4a1 1 0 0 0 1 1h2a2 2 0 0 0 2-2v-6.465a2 2 0 0 0-.89-1.664l-5.555-3.703Z"></path></svg></span>
+                                                </div>
+                                                <span class="Polaris-Navigation__Text_yj3uv">Startside</span>
+                                            </a>
+                                        </div>
+                                    </li>
+                                    <li class="Polaris-Navigation__ListItem_wxd2m">
+                                        <div class="Polaris-Navigation__ItemWrapper_1kbav">
+                                            <a data-polaris-unstyled="true" class="Polaris-Navigation__Item_yiyol" tabindex="0" aria-disabled="false" aria-expanded="false" aria-controls="PolarisSecondaryNavigation24" href="/admin/orders">
+                                                <div class="Polaris-Navigation__Icon_yj27d">
+                                                    <span class="Polaris-Icon_yj27d"><span class="Polaris-VisuallyHidden_yrtt5"></span><svg viewBox="0 0 20 20" class="Polaris-Icon__Svg_375hu" focusable="false" aria-hidden="true"><path d="M3.735 5.507a3 3 0 0 1 2.96-2.507h6.61a3 3 0 0 1 2.96 2.507l.735 4.493v5a2 2 0 0 1-2 2h-10a2 2 0 0 1-2-2v-5l.735-4.493Zm2.96-.507a1 1 0 0 0-.987.836l-.708 4.164v1h1.394a3 3 0 0 1 1.665.504l.832.555a2 2 0 0 0 2.218 0l.832-.555a3 3 0 0 1 1.666-.504h1.393v-1l-.708-4.164a1 1 0 0 0-.986-.836h-6.612Z"></path></svg></span>
+                                                </div>
+                                                <span class="Polaris-Navigation__Text_yj3uv">Bestillinger</span>
+                                                <div class="Polaris-Navigation__Badge_2qgie">
+                                                    <span class="Polaris-Badge_2qgie Polaris-Badge--statusNew_cj8gz Polaris-Badge--sizeSmall_7647q"><span class="Polaris-VisuallyHidden_yrtt5">Ny</span><span>34</span></span>
+                                                </div>
+                                            </a>
+                                        </div>
+                                        <div class="Polaris-Navigation__SecondaryNavigation_na5at">
+                                            <div id="PolarisSecondaryNavigation24" class="Polaris-Collapsible_1dqql Polaris-Collapsible--isFullyClosed_dljrt" aria-hidden="true" style="transition-duration: 0ms; transition-timing-function: linear; max-height: 0px; overflow: hidden;"></div>
+                                        </div>
+                                    </li>
+                                    <li class="Polaris-Navigation__ListItem_wxd2m">
+                                        <div class="Polaris-Navigation__ItemWrapper_1kbav">
+                                            <a data-polaris-unstyled="true" class="Polaris-Navigation__Item_yiyol" tabindex="0" aria-disabled="false" aria-expanded="false" aria-controls="PolarisSecondaryNavigation26" href="/admin/products">
+                                                <div class="Polaris-Navigation__Icon_yj27d">
+                                                    <span class="Polaris-Icon_yj27d"><span class="Polaris-VisuallyHidden_yrtt5"></span><svg viewBox="0 0 20 20" class="Polaris-Icon__Svg_375hu" focusable="false" aria-hidden="true"><path d="M10.408 3h5.592a1 1 0 0 1 1 1v5.592a2 2 0 0 1-.57 1.399l-5.162 5.277a2.5 2.5 0 0 1-3.536 0l-4-4a2.5 2.5 0 0 1 0-3.536l.008-.008 5.27-5.154a2 2 0 0 1 1.397-.57Zm3.092 5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"></path></svg></span>
+                                                </div>
+                                                <span class="Polaris-Navigation__Text_yj3uv">Produkter</span>
+                                            </a>
+                                        </div>
+                                        <div class="Polaris-Navigation__SecondaryNavigation_na5at">
+                                            <div id="PolarisSecondaryNavigation26" class="Polaris-Collapsible_1dqql Polaris-Collapsible--isFullyClosed_dljrt" aria-hidden="true" style="transition-duration: 0ms; transition-timing-function: linear; max-height: 0px; overflow: hidden;"></div>
+                                        </div>
+                                    </li>
+                                    <li class="Polaris-Navigation__ListItem_wxd2m">
+                                        <div class="Polaris-Navigation__ItemWrapper_1kbav">
+                                            <a data-polaris-unstyled="true" class="Polaris-Navigation__Item_yiyol" tabindex="0" aria-disabled="false" aria-expanded="false" aria-controls="PolarisSecondaryNavigation28" href="/admin/customers">
+                                                <div class="Polaris-Navigation__Icon_yj27d">
+                                                    <span class="Polaris-Icon_yj27d"><span class="Polaris-VisuallyHidden_yrtt5"></span><svg viewBox="0 0 20 20" class="Polaris-Icon__Svg_375hu" focusable="false" aria-hidden="true"><path d="M10 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm-3.5 8a2.5 2.5 0 0 1-1.768-4.268c.59-.577 2.468-1.732 5.268-1.732s4.678 1.155 5.268 1.732a2.5 2.5 0 0 1-1.768 4.268h-7Z"></path></svg></span>
+                                                </div>
+                                                <span class="Polaris-Navigation__Text_yj3uv">Kunder</span>
+                                            </a>
+                                        </div>
+                                        <div class="Polaris-Navigation__SecondaryNavigation_na5at">
+                                            <div id="PolarisSecondaryNavigation28" class="Polaris-Collapsible_1dqql Polaris-Collapsible--isFullyClosed_dljrt" aria-hidden="true" style="transition-duration: 0ms; transition-timing-function: linear; max-height: 0px; overflow: hidden;"></div>
+                                        </div>
+                                    </li>
+                                    <li class="Polaris-Navigation__ListItem_wxd2m">
+                                        <div class="Polaris-Navigation__ItemWrapper_1kbav">
+                                            <a data-polaris-unstyled="true" class="Polaris-Navigation__Item_yiyol" tabindex="0" aria-disabled="false" aria-expanded="false" aria-controls="PolarisSecondaryNavigation30" href="/admin/finances">
+                                                <div class="Polaris-Navigation__Icon_yj27d">
+                                                    <span class="Polaris-Icon_yj27d"><span class="Polaris-VisuallyHidden_yrtt5"></span><svg viewBox="0 0 20 20" class="Polaris-Icon__Svg_375hu" focusable="false" aria-hidden="true"><path fill-rule="evenodd" d="M9.445 3.168a1 1 0 0 1 1.11 0l6 4a1 1 0 0 1 .152 1.54l-.707.706v4.586a1.55 1.55 0 0 1-.55 3h-10.9a1.55 1.55 0 0 1-.55-3v-4.586l-.707-.707a1 1 0 0 1 .152-1.54l6-3.999Zm2.555 5.832a1 1 0 0 1 1 1v3a1 1 0 1 1-2 0v-3a1 1 0 0 1 1-1Zm-3 1a1 1 0 0 0-2 0v3a1 1 0 1 0 2 0v-3Z"></path></svg></span>
+                                                </div>
+                                                <span class="Polaris-Navigation__Text_yj3uv">Økonomi</span>
+                                            </a>
+                                        </div>
+                                        <div class="Polaris-Navigation__SecondaryNavigation_na5at">
+                                            <div id="PolarisSecondaryNavigation30" class="Polaris-Collapsible_1dqql Polaris-Collapsible--isFullyClosed_dljrt" aria-hidden="true" style="transition-duration: 0ms; transition-timing-function: linear; max-height: 0px; overflow: hidden;"></div>
+                                        </div>
+                                    </li>
+                                    <li class="Polaris-Navigation__ListItem_wxd2m">
+                                        <div class="Polaris-Navigation__ItemWrapper_1kbav">
+                                            <a data-polaris-unstyled="true" class="Polaris-Navigation__Item_yiyol" tabindex="0" aria-disabled="false" aria-expanded="false" aria-controls="PolarisSecondaryNavigation32" href="/admin/dashboards">
+                                                <div class="Polaris-Navigation__Icon_yj27d">
+                                                    <span class="Polaris-Icon_yj27d"><span class="Polaris-VisuallyHidden_yrtt5"></span><svg viewBox="0 0 20 20" class="Polaris-Icon__Svg_375hu" focusable="false" aria-hidden="true"><path d="M7 11a1 1 0 1 1 2 0v5a1 1 0 1 1-2 0v-5Zm4-5a1 1 0 1 1 2 0v10a1 1 0 1 1-2 0v-10Zm4-2a1 1 0 1 1 2 0v12a1 1 0 1 1-2 0v-12Zm-12 4a1 1 0 0 1 2 0v8a1 1 0 1 1-2 0v-8Z"></path></svg></span>
+                                                </div>
+                                                <span class="Polaris-Navigation__Text_yj3uv">Analyser</span>
+                                            </a>
+                                        </div>
+                                        <div class="Polaris-Navigation__SecondaryNavigation_na5at">
+                                            <div id="PolarisSecondaryNavigation32" class="Polaris-Collapsible_1dqql Polaris-Collapsible--isFullyClosed_dljrt" aria-hidden="true" style="transition-duration: 0ms; transition-timing-function: linear; max-height: 0px; overflow: hidden;"></div>
+                                        </div>
+                                    </li>
+                                    <li class="Polaris-Navigation__ListItem_wxd2m">
+                                        <div class="Polaris-Navigation__ItemWrapper_1kbav">
+                                            <a data-polaris-unstyled="true" class="Polaris-Navigation__Item_yiyol" tabindex="0" aria-disabled="false" aria-expanded="false" aria-controls="PolarisSecondaryNavigation34" href="/admin/marketing">
+                                                <div class="Polaris-Navigation__Icon_yj27d">
+                                                    <span class="Polaris-Icon_yj27d"><span class="Polaris-VisuallyHidden_yrtt5"></span><svg viewBox="0 0 20 20" class="Polaris-Icon__Svg_375hu" focusable="false" aria-hidden="true"><path d="M9 4a5 5 0 0 0-.163 9.997l.662 1.986a7 7 0 1 1 6.484-6.484l-1.986-.662a5 5 0 0 0-4.997-4.837Z"></path><path d="M9 8a1 1 0 0 0 0 2v2a3 3 0 1 1 3-3h-2a1 1 0 0 0-1-1Z"></path><path d="M11.316 10.051a1 1 0 0 0-1.265 1.265l2 6a1 1 0 0 0 1.898 0l.842-2.525 2.525-.842a1 1 0 0 0 0-1.898l-6-2Z"></path></svg></span>
+                                                </div>
+                                                <span class="Polaris-Navigation__Text_yj3uv">Markedsføring</span>
+                                            </a>
+                                        </div>
+                                        <div class="Polaris-Navigation__SecondaryNavigation_na5at">
+                                            <div id="PolarisSecondaryNavigation34" class="Polaris-Collapsible_1dqql Polaris-Collapsible--isFullyClosed_dljrt" aria-hidden="true" style="transition-duration: 0ms; transition-timing-function: linear; max-height: 0px; overflow: hidden;"></div>
+                                        </div>
+                                    </li>
+                                    <li class="Polaris-Navigation__ListItem_wxd2m">
+                                        <div class="Polaris-Navigation__ItemWrapper_1kbav">
+                                            <a data-polaris-unstyled="true" class="Polaris-Navigation__Item_yiyol" tabindex="0" aria-disabled="false" href="/admin/discounts">
+                                                <div class="Polaris-Navigation__Icon_yj27d">
+                                                    <span class="Polaris-Icon_yj27d"><span class="Polaris-VisuallyHidden_yrtt5"></span><svg viewBox="0 0 20 20" class="Polaris-Icon__Svg_375hu" focusable="false" aria-hidden="true"><path fill-rule="evenodd" d="M6 3.072a2 2 0 0 0-.99 1.939 2 2 0 0 0-1.826 3.163 2 2 0 0 0 0 3.652 2 2 0 0 0 1.826 3.164 2 2 0 0 0 3.164 1.828 2 2 0 0 0 3.652 0 2 2 0 0 0 3.164-1.827 2 2 0 0 0 1.826-3.164 2 2 0 0 0 0-3.652 2 2 0 0 0-1.826-3.165 2 2 0 0 0-3.163-1.826 2 2 0 0 0-3.654 0 2 2 0 0 0-2.173-.112Zm6.832 4.483a1 1 0 1 0-1.664-1.11l-4 6a1 1 0 0 0 1.664 1.11l4-6Zm-5.832 1.445a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm7 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg></span>
+                                                </div>
+                                                <span class="Polaris-Navigation__Text_yj3uv">Rabatter</span>
+                                            </a>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            <ul class="qVH5c">
+                                <li class="IypnU">
+                                    <div class="i0UOo">
+                                        <button type="button" class="jb2yQ"><span>Salgskanaler</span><span class="uKxlv"><span class="Polaris-Icon_yj27d"><span class="Polaris-VisuallyHidden_yrtt5"></span><svg viewBox="0 0 20 20" class="Polaris-Icon__Svg_375hu" focusable="false" aria-hidden="true"><path d="M8 16a.999.999 0 0 1-.707-1.707l4.293-4.293-4.293-4.293a.999.999 0 1 1 1.414-1.414l5 5a.999.999 0 0 1 0 1.414l-5 5a.997.997 0 0 1-.707.293z"></path></svg></span></span></button>
+                                    </div>
+                                    <ul class="hFArt">
+                                        <li class="DF2ig" role="button" tabindex="-1" aria-disabled="true" aria-roledescription="sortable" aria-describedby="DndDescribedBy-2">
+                                            <ul class="PwNOf">
+                                                <div>
+                                                    <span>
+                                                <li class="Polaris-Navigation__ListItem_wxd2m">
+                                                    <div class="Polaris-Navigation__ItemWrapper_1kbav">
+                                                        <a data-polaris-unstyled="true" class="Polaris-Navigation__Item_yiyol Polaris-Navigation--subNavigationActive_e2t9x Polaris-Navigation--itemChildActive_mmevl" tabindex="0" aria-disabled="false" aria-expanded="true" aria-controls="PolarisSecondaryNavigation37" href="/admin/themes?channel=true">
+                                                            <div class="Polaris-Navigation__Icon_yj27d Polaris-Navigation__Icon--resized_1snul">
+                                                                <span class="Polaris-Icon_yj27d"><span class="Polaris-VisuallyHidden_yrtt5"></span><img class="Polaris-Icon__Img_375hq" src="data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 20 20&quot;><path d=&quot;M2.971 1.545A1 1 0 013.861 1h12.277a1 1 0 01.89.545l1.669 3.128c.03.062.063.138.094.224.09.228.153.47.185.722.015.098.024.189.024.263V6a2.992 2.992 0 01-1.092 2.315A2.988 2.988 0 0116 9c-.617 0-1.19-.186-1.666-.505A2.997 2.997 0 0113 6v.02A2.997 2.997 0 0110 9a2.986 2.986 0 01-1.677-.512A2.997 2.997 0 017 6.019 2.997 2.997 0 014 9c-.768 0-1.47-.289-2-.764C1.386 7.686 1 6.888 1 6v-.118c0-.063.007-.137.019-.218.049-.443.194-.856.415-1.219l1.537-2.9zM18 17.5v-6.916A4.983 4.983 0 0116 11a4.978 4.978 0 01-3-1c-.836.628-1.874 1-3 1a4.978 4.978 0 01-3-1c-.836.628-1.874 1-3 1a4.983 4.983 0 01-2-.416V17.5A1.5 1.5 0 003.5 19h2A1.5 1.5 0 007 17.5v-3A1.5 1.5 0 018.5 13h3a1.5 1.5 0 011.5 1.5v3a1.5 1.5 0 001.5 1.5h2a1.5 1.5 0 001.5-1.5z&quot;/></svg>" alt="" aria-hidden="true"></span>
+                                                            </div>
+                                                            <span class="Polaris-Navigation__Text_yj3uv">Nettbutikk</span>
+                                                            <div class="Polaris-Navigation__Badge_2qgie">
+                                                                <div class="lGwZ0">
+                                                                    <div class="nJGnd">
+                                                                        <button class="Polaris-Button_r99lw Polaris-Button--plain_2z97r" type="button"><span class="Polaris-Button__Content_xd1mk"></span></button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </a>
+                                                    </div>
+                                                    <div class="Polaris-Navigation__SecondaryNavigation_na5at Polaris-Navigation--isExpanded_nh91q">
+                                                        <div id="PolarisSecondaryNavigation37" class="Polaris-Collapsible_1dqql" aria-hidden="false" style="transition-duration: 0ms; transition-timing-function: linear; max-height: 145px; overflow: hidden;">
+                                                            <ul class="Polaris-Navigation__List_yj3nl">
+                                                                <li class="Polaris-Navigation__ListItem_wxd2m">
+                                                                    <div class="Polaris-Navigation__ItemWrapper_1kbav">
+                                                                        <a data-polaris-unstyled="true" class="Polaris-Navigation__Item_yiyol Polaris-Navigation__Item--selected_13f25 Polaris-Navigation--subNavigationActive_e2t9x" tabindex="0" aria-disabled="false" href="/admin/themes?channel=true"><span class="Polaris-Navigation__Text_yj3uv">Temaer</span></a>
+                                                                    </div>
+                                                                </li>
+                                                                <li class="Polaris-Navigation__ListItem_wxd2m">
+                                                                    <div class="Polaris-Navigation__ItemWrapper_1kbav">
+                                                                        <a data-polaris-unstyled="true" class="Polaris-Navigation__Item_yiyol" tabindex="0" aria-disabled="false" href="/admin/articles?channel=true"><span class="Polaris-Navigation__Text_yj3uv">Blogginnlegg</span></a>
+                                                                    </div>
+                                                                </li>
+                                                                <li class="Polaris-Navigation__ListItem_wxd2m">
+                                                                    <div class="Polaris-Navigation__ItemWrapper_1kbav">
+                                                                        <a data-polaris-unstyled="true" class="Polaris-Navigation__Item_yiyol" tabindex="0" aria-disabled="false" href="/admin/pages?channel=true"><span class="Polaris-Navigation__Text_yj3uv">Sider</span></a>
+                                                                    </div>
+                                                                </li>
+                                                                <li class="Polaris-Navigation__ListItem_wxd2m">
+                                                                    <div class="Polaris-Navigation__ItemWrapper_1kbav">
+                                                                        <a data-polaris-unstyled="true" class="Polaris-Navigation__Item_yiyol" tabindex="0" aria-disabled="false" href="/admin/menus?channel=true"><span class="Polaris-Navigation__Text_yj3uv">Navigasjon</span></a>
+                                                                    </div>
+                                                                </li>
+                                                                <li class="Polaris-Navigation__ListItem_wxd2m">
+                                                                    <div class="Polaris-Navigation__ItemWrapper_1kbav">
+                                                                        <a data-polaris-unstyled="true" class="Polaris-Navigation__Item_yiyol" tabindex="0" aria-disabled="false" href="/admin/online_store/preferences?channel=true"><span class="Polaris-Navigation__Text_yj3uv">Preferanser</span></a>
+                                                                    </div>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </li></span>
+                        </div>
+                        <div class="YuE4j">
+                            <div class="nJGnd">
+                                <span class="TRIGV"><span><a href="https://agravitae-demo.myshopify.com/?_bt=eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaEpJaUZoWjNKaGRtbDBZV1V0WkdWdGJ5NXRlWE5vYjNCcFpua3VZMjl0QmpvR1JWUT0iLCJleHAiOiIyMDIyLTA5LTAzVDE2OjA1OjQyLjUwMFoiLCJwdXIiOiJwZXJtYW5lbnRfcGFzc3dvcmRfYnlwYXNzIn19--0c8d6166c2456fd87eb6a0370dee26949cd9d5f9&amp;_cd=991aea33bb8036d7bcb69cb87a3dae0e60363345afd7cd307fd3da7863972af0&amp;_uid=73453338658&amp;preview_theme_id=" target="_blank" rel="noopener noreferrer" data-polaris-unstyled="true" class="Polaris-Button_r99lw Polaris-Button--plain_2z97r Polaris-Button--iconOnly_viazp" aria-label="Se nettbutikken din" tabindex="0" aria-describedby="PolarisTooltipContent2" data-polaris-tooltip-activator="true"><span class="Polaris-Button__Content_xd1mk"><span class="Polaris-Button__Icon_yj27d"><span class="Polaris-Icon_yj27d"><span class="Polaris-VisuallyHidden_yrtt5"></span><svg viewBox="0 0 20 20" class="Polaris-Icon__Svg_375hu" focusable="false" aria-hidden="true"><path d="M17.928 9.628c-.091-.229-2.317-5.628-7.928-5.628s-7.838 5.399-7.93 5.628a1.017 1.017 0 0 0 0 .744c.093.229 2.319 5.628 7.93 5.628s7.837-5.399 7.928-5.628a1.017 1.017 0 0 0 0-.744zm-7.928 4.372a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm0-6a2 2 0 1 0 .002 4.001 2 2 0 0 0-.003-4.001z"></path></svg></span></span></span></a></span></span>
+                            </div>
+                        </div></ul></li></ul>
+                        <div id="DndLiveRegion-2" role="status" aria-live="assertive" aria-atomic="true" style="position: fixed; width: 1px; height: 1px; margin: -1px; border: 0px; padding: 0px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); clip-path: inset(100%); white-space: nowrap;"></div></li>
+                        <li class="IypnU">
+                            <div class="i0UOo">
+                                <button type="button" class="jb2yQ"><span>Apper</span><span class="uKxlv"><span class="Polaris-Icon_yj27d"><span class="Polaris-VisuallyHidden_yrtt5"></span><svg viewBox="0 0 20 20" class="Polaris-Icon__Svg_375hu" focusable="false" aria-hidden="true"><path d="M8 16a.999.999 0 0 1-.707-1.707l4.293-4.293-4.293-4.293a.999.999 0 1 1 1.414-1.414l5 5a.999.999 0 0 1 0 1.414l-5 5a.997.997 0 0 1-.707.293z"></path></svg></span></span></button>
+                            </div>
+                            <ul class="hFArt aFQzf"></ul>
+                            <div id="DndLiveRegion-3" role="status" aria-live="assertive" aria-atomic="true" style="position: fixed; width: 1px; height: 1px; margin: -1px; border: 0px; padding: 0px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); clip-path: inset(100%); white-space: nowrap;"></div>
+                        </li></ul>
+                        <div class="tCaSv">
+                            <ul class="Polaris-Navigation__Section_1b1h1">
+                                <li class="Polaris-Navigation__ListItem_wxd2m">
+                                    <div class="Polaris-Navigation__ItemWrapper_1kbav">
+                                        <a data-polaris-unstyled="true" class="Polaris-Navigation__Item_yiyol" tabindex="0" href="/admin/settings">
+                                            <div class="Polaris-Navigation__Icon_yj27d">
+                                                <span class="Polaris-Icon_yj27d"><span class="Polaris-VisuallyHidden_yrtt5"></span><svg viewBox="0 0 20 20" class="Polaris-Icon__Svg_375hu" focusable="false" aria-hidden="true"><path d="M10 13a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm7.476-1.246c-1.394-.754-1.394-2.754 0-3.508a1 1 0 0 0 .376-1.404l-1.067-1.733a1 1 0 0 0-1.327-.355l-.447.243c-1.329.719-2.945-.244-2.945-1.755v-.242a1 1 0 0 0-1-1h-2.132a1 1 0 0 0-1 1v.242c0 1.511-1.616 2.474-2.945 1.755l-.447-.243a1 1 0 0 0-1.327.355l-1.067 1.733a1 1 0 0 0 .376 1.404c1.394.754 1.394 2.754 0 3.508a1 1 0 0 0-.376 1.404l1.067 1.733a1 1 0 0 0 1.327.355l.447-.243c1.329-.719 2.945.244 2.945 1.755v.242a1 1 0 0 0 1 1h2.132a1 1 0 0 0 1-1v-.242c0-1.511 1.616-2.474 2.945-1.755l.447.243a1 1 0 0 0 1.327-.355l1.067-1.733a1 1 0 0 0-.376-1.404z"></path></svg></span>
+                                            </div>
+                                            <span class="Polaris-Navigation__Text_yj3uv">Innstillinger</span>
+                                        </a>
+                                    </div>
+                                </li>
+                            </ul>
+                </div>
+                </nav>
+            </div>
+            <button type="button" class="Polaris-Frame__NavigationDismiss_s8t2w" aria-hidden="true" aria-label="Lukk navigasjon" tabindex="-1"><span class="Polaris-Icon_yj27d"><span class="Polaris-VisuallyHidden_yrtt5"></span><svg viewBox="0 0 20 20" class="Polaris-Icon__Svg_375hu" focusable="false" aria-hidden="true"><path d="m11.414 10 6.293-6.293a1 1 0 1 0-1.414-1.414l-6.293 6.293-6.293-6.293a1 1 0 0 0-1.414 1.414l6.293 6.293-6.293 6.293a1 1 0 1 0 1.414 1.414l6.293-6.293 6.293 6.293a.998.998 0 0 0 1.707-.707.999.999 0 0 0-.293-.707l-6.293-6.293z"></path></svg></span></button>
+        </div>
+    </div>
+    <div class="Polaris-Frame__ContextualSaveBar_14m7v Polaris-Frame-CSSAnimation--startFade_1gu4x"></div>
+    <main class="Polaris-Frame__Main_yj28s" id="AppFrameMain" data-has-global-ribbon="false">
+        @RenderBody()
+    </main>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    @* Global Javascript *@
+    @Html.Partial("_GlobalScripts")
+
+    <!-- Page Scripts -->
+    @RenderSection("scripts", required: false)
+    @Html.PartialScripts()
+    @Html.AntiForgeryToken()
+
+    <script>
+        function resize() {
+            var height = document.getElementsByTagName("html")[0].scrollHeight + 20;
+            window.parent.postMessage(["setHeight", height], "*");
+        }
+    </script>
+</body>
+</html>
+

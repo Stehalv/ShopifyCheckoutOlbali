@@ -1,0 +1,240 @@
+﻿@{
+    #region Properties
+    var PropertyBag = (ShoppingCartCheckoutPropertyBag)ViewBag.PropertyBag;
+    // Market and Language properties
+    var availableMarkets = GlobalSettings.Markets.AvailableMarkets;
+    var availableLanguages = ExigoDAL.GetLanguages();
+    var selectedMarket = GlobalUtilities.GetCurrentMarket(this.Context);
+    var selectedCountry = CommonResources.Countries(selectedMarket.MainCountry);
+    var selectedLanguage = GlobalUtilities.GetSelectedLanguage(this.Context, selectedMarket.AvailableLanguages.First().CultureCode, selectedMarket);
+    var isEnrollment = ViewContext.RouteData.Values["controller"].ToString().ToLower().Contains("enrollment");
+    var countryHiddenClass = (availableMarkets.Count > 1) ? "" : "hidden";
+    var languageHiddenClass = (availableLanguages.Count() > 1) ? "" : "hidden";
+    var modalHeaderText = "";
+
+    if (availableMarkets.Count > 1 && availableLanguages.Count() > 1)
+    {
+        modalHeaderText = Resources.Common.SelectCountLang;
+    }
+    else if (availableMarkets.Count > 1)
+    {
+        modalHeaderText = Resources.Common.SelectCountry;
+    }
+    else
+    {
+        modalHeaderText = Resources.Common.SelectLanguage;
+    }
+    #endregion
+}
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html lang="en" class="lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html lang="en" class="lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html lang="en" class="lt-ie9"> <![endif]-->
+<!--[if IE 9]>         <html lang="en" class="ie9"> <![endif]-->
+<html lang="en" data-scroll="0">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no">
+    <meta name="mobileoptimized" content="0" />
+    <meta name="published" content="@MvcApplication.ApplicationStartDate" />
+
+
+    @if (ViewBag.Title != null && ViewBag.Title != "")
+    {
+
+        <title>@ViewBag.Title - @Resources.Common.CompanyName</title>
+    }
+    else
+    {
+        <title>@Resources.Common.CompanyName</title>
+
+    }
+
+
+    <link rel="app" id="apppath" href="@Request.ApplicationPath" />
+    <link rel="app" id="appauthenticated" href="@Request.IsAuthenticated.ToString()" />
+    <link rel="app" id="appsessiontimeout" href="@GlobalSettings.ReplicatedSites.SessionTimeout" />
+
+    <link rel="shortcut icon" href="~/Content/images/lab-icon.png" type="image/x-icon" />
+    <link rel="apple-touch-icon" href="~/Content/images/lab-icon.png" />
+    <link rel="apple-touch-icon" sizes="57x57" href="~/Content/images/lab-icon.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="~/Content/images/lab-icon.png" />
+    <link rel="apple-touch-icon" sizes="76x76" href="~/Content/images/lab-icon.png" />
+    <link rel="apple-touch-icon" sizes="114x114" href="~/Content/images/lab-icon.png" />
+    <link rel="apple-touch-icon" sizes="120x120" href="~/Content/images/lab-icon.png" />
+    <link rel="apple-touch-icon" sizes="144x144" href="~/Content/images/lab-icon.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="~/Content/images/lab-icon.png" />
+    @* Styles *@
+
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700|Raleway:300,400,500,600,700|Crete+Round:400i" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/timepicker@1.11.15/jquery.timepicker.css" />
+    @Styles.Render("~/bundles/styles/vendor")
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/flick/jquery-ui.css" />
+    <link href="~/Content/styles/vendor/Bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/styles/shopifycheckout.min.css?v=@Settings.StyleVersionNumber" rel="stylesheet" />
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" integrity="sha256-FdatTf20PQr/rWg+cAKfl6j4/IY3oohFAJ7gVC3M34E=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" />
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/kenwheeler/slick@1.8.1/slick/slick-theme.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" />
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/&#64;splidejs/splide-extension-video@latest/dist/css/splide-extension-video.min.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" integrity="sha256-FdatTf20PQr/rWg+cAKfl6j4/IY3oohFAJ7gVC3M34E=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/&#64;ttskch/select2-bootstrap4-theme/dist/select2-bootstrap4.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.2/toastr.min.css" rel="stylesheet">
+
+    @RenderSection("styles", required: false)
+    @* Scripts *@
+    <script src="@RouteJs.RouteJsHandler.HandlerUrl"></script>
+    <script src="@Url.Action("culture", "app" )"></script>
+    <!-- RequireJS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.20/require.min.js" data-main="@Url.Content(" ~/Content/scripts/main.js")"></script>
+    <script>
+        require.config({
+            baseUrl: '/Content/scripts',
+            waitSeconds: 60,
+            @if (HttpContext.Current.IsDebuggingEnabled) { <text>urlArgs: "bust=" + (new Date()).getTime(),</text> }
+            paths: {
+                'main': 'main',
+                'addresses': 'modules/addresses.min',
+                'app': 'modules/app.min',
+                'ajax': 'modules/ajax.min',
+                'browser': 'modules/browser.min',
+                'calendars': 'modules/calendars.min',
+                'console': 'modules/console.min',
+                'containers': 'modules/containers.min',
+                'cookies': 'modules/cookies.min',
+                'debug': 'modules/debug.min',
+                'encryptions': 'modules/encryptions.min',
+                'extensions': 'modules/extensions.min',
+                'forms': 'modules/forms.min',
+                'guids': 'modules/guids.min',
+                'idletimeout': 'modules/idletimeout.min',
+                'kendogrids': 'modules/kendogrids.min',
+                'passwords': 'modules/passwords.min',
+                'popups': 'modules/popups.min',
+                'pubsub': 'modules/pubsub.min',
+                'shopping': 'modules/shopping',
+                'urls': 'modules/urls.min',
+                'widgets': 'modules/widgets.min',
+                'handlebars': '@Scripts.Url("~/bundles/scripts/handlebars")',
+                // OLD FROM CDN
+                //'jquery': 'https://code.jquery.com/jquery-1.11.3.min',
+                // Local
+                'jquery': 'vendor/jquery-3.3.1.min',
+                //'jquery': 'vendor/jquery-1.11.3.min',
+                'bootstrap': 'https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min',
+                'jquery-ui': 'https://code.jquery.com/ui/1.12.1/jquery-ui.min',
+                'bootstrap-hover-dropdown': 'vendor/bootstrap-hover-dropdown.min',
+                'jquery-validate': 'vendor/jquery.validate.min',
+                'jquery-validate-unobtrusive': 'vendor/jquery.validate.unobtrusive.min',
+                'jquery-validate-unobtrusive-custom': 'vendor/jquery.validate.unobtrusive.custom.min',
+                'jquery-unobtrusive-ajax': 'vendor/jquery.unobtrusive-ajax.min',
+                'jquery-sumoselect': 'vendor/jquery.sumoselect.min',
+                'kendo': 'vendor/kendo/scripts/kendo.web.min',
+                'kendo-cultures': 'vendor/kendo/scripts/kendo.culture.min',
+                'mask': 'vendor/jquery.mask.min',
+                'moment': 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment-with-locales.min',
+                'tinymce': '//cdn.tinymce.com/4/tinymce.min',
+
+                @* theme requireses *@
+                'animsition': 'modules/animsition.min',
+
+                //new view javascript files
+                'timepicker': 'https://cdn.jsdelivr.net/npm/timepicker@1.11.15/jquery.timepicker.min',
+                'toastr': 'https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.2/toastr.min',
+                'splide-video': 'https://cdn.jsdelivr.net/npm/@@splidejs/splide-extension-video@latest/dist/js/splide-extension-video.min'
+            },
+        shim: {
+            'bootstrap': {
+                deps: ["jquery", "jquery-ui", 'bootstrap-hover-dropdown']
+            },
+            'jquery-validate-unobtrusive': {
+                deps: ['jquery-validate']
+            },
+            'jquery-unobtrusive-ajax': {
+                deps: ['jquery']
+            },
+            'jquery-sumoselect': {
+                deps: ['jquery']
+            },
+            'toastr': {
+                deps: ['jquery']
+            },
+            'handlebars': {
+                exports: 'Handlebars'
+            },
+            'animsition': {
+                deps: ['jquery']
+            }
+        },
+        deps: ["bootstrap", "extensions", "forms"]
+        });
+    </script>
+    <!--[if lt IE 9]>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    @RenderSection("header", required: false)
+    @if (!GlobalSettings.ReplicatedSites.GoogleAnalyticsWebPropertyID.IsNullOrEmpty())
+    {
+        <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', '@GlobalSettings.ReplicatedSites.GoogleAnalyticsWebPropertyID', 'auto');
+      ga('send', 'pageview');
+
+        </script>
+    }
+</head>
+<body data-loader="2" data-loader-color="red">
+    <style>
+        #cc-wrapper iframe {
+            height: 40px !important;
+        }
+    </style>
+    <header class="mobile-header">
+        @Html.Partial("Partials/_MobileHeader", PropertyBag.Cart)
+    </header>
+    <div class="content">
+        <div class="wrap">
+            <div class="main">
+                <header class="main_header">
+                    @Html.Partial("Partials/_Header", PropertyBag.Cart)
+                </header>
+                <div class="main_content">
+                    @if (PropertyBag.Customer != null && (PropertyBag.Customer.CustomerID == 0 || (PropertyBag.Customer.CustomerID != 0 && PropertyBag.Cart.OrderItems.Any() && PropertyBag.Cart.ShippingAddress)))
+                    {
+                        @Html.Partial("Partials/_Summary", PropertyBag)
+                    }
+                    @RenderBody()
+                </div>
+                @Html.Partial("Partials/_Footer")
+            </div>
+            <aside class="sidebar">
+                @Html.Partial("Partials/_Cart", PropertyBag.Cart)
+            </aside>
+        </div>
+    </div>
+
+    <div id="account-modal"></div>
+    <div class="modal" tabindex="-1" role="dialog" id="place-order-modal">
+        <div class="modal-dialog" role="document" style="top: 40%; color: white; text-align: center;">
+            <h5 id="placing-order-message">@Resources.Checkout.Payments_PlacingOrderMessage</h5>
+        </div>
+    </div>
+    <!-- Page Scripts -->
+    @RenderSection("scripts", required: false)
+    @Html.AntiForgeryToken()
+</body>
+</html>
+

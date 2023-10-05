@@ -1,0 +1,96 @@
+﻿@model ShopifyApp.Models.AppProduct
+
+@{
+    ViewBag.Title = "View";
+}
+
+<h2>View</h2>
+
+<div>
+    <h4>Model.Description</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            ID#
+        </dt>
+        <dd>
+            @Model.ShopifyProduct.Id
+        </dd>
+    </dl>
+    <dl class="dl-horizontal">
+        <dt>
+            Title
+        </dt>
+        <dd>
+            @Model.ShopifyProduct.Title
+        </dd>
+    </dl>
+
+    <dl class="dl-horizontal">
+        <dt>
+            <a href="@Url.Action("SyncProductPrices", "Product", new { ShopId = Model.ShopifyProduct.Id, configId = Model.TenantConfigId })">Sync Prices</a>
+        </dt>
+    </dl>
+    <div class="row">
+        <div class="col-11 col-xs-offset-1">
+            <table width="100%">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Retail Price</th>
+                        <th>Beauty Insider Price</th>
+                        <th>Brand Partner Price</th>
+                        <th>In Sync</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.ProductVariants)
+                    {
+                        <tr>
+                            <td>@item.ShopifyVariant.Title</td>
+                            <td>
+                                @if (item.ShopifyVariant.Metafields.Where(c => c.Namespace == "pricing" && c.Key.Contains("1")).Any())
+                                {
+                                    foreach (var field in item.ShopifyVariant.Metafields.Where(c => c.Namespace == "pricing" && c.Key.Contains("1")))
+                                    {
+                                        var currency = field.Key.Split('_');
+                                        var value = Convert.ToDecimal(field.Value) / 100;
+                                        <span>@value.ToString("n2") @currency[1].ToString()</span>
+                                    }
+                                }
+                            </td>
+                            <td>
+                                @if (item.ShopifyVariant.Metafields.Where(c => c.Namespace == "pricing" && c.Key.Contains("2")).Any())
+                                {
+                                    foreach (var field in item.ShopifyVariant.Metafields.Where(c => c.Namespace == "pricing" && c.Key.Contains("2")))
+                                    {
+                                        var currency = field.Key.Split('_');
+                                        var value = Convert.ToDecimal(field.Value) / 100;
+                                        <span>@value.ToString("n2") @currency[1].ToString()</span>
+                                    }
+                                }
+                            </td>
+                            <td>
+                                @if (item.ShopifyVariant.Metafields.Where(c => c.Namespace == "pricing" && c.Key.Contains("3")).Any())
+                                {
+                                    foreach (var field in item.ShopifyVariant.Metafields.Where(c => c.Namespace == "pricing" && c.Key.Contains("3")))
+                                    {
+                                        var currency = field.Key.Split('_');
+                                        var value = Convert.ToDecimal(field.Value) / 100;
+                                        <span>@value.ToString("n2") @currency[1].ToString()</span><br />
+                                    }
+                                }
+                            </td>
+                            <td>
+                                @item.InSync.ToString()
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<p>
+    @Html.ActionLink("Back to List", "Index", new { tenantConfigId = Model.TenantConfigId })
+</p>

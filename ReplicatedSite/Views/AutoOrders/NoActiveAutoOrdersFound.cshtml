@@ -1,0 +1,12 @@
+﻿@{
+    ViewBag.Title = Resources.Common.JoinTheAutoOrder;
+}
+
+<div id="view-about-autoorder">
+
+    <div class="content-wrap">
+        <div class="container">
+            @Html.Raw(Resources.Common.Replicated_AutoOrder_NoAutoOrderFound.FormatWith(Url.Action("ManageAutoOrder")))
+        </div>
+    </div>
+</div>

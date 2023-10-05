@@ -1,0 +1,73 @@
+﻿@model List<ShopifyApp.Models.Webhook>
+@{
+    ViewBag.Title = "Webhook Backlog";
+    Layout = "~/Areas/Shopify/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    #sub-menu {
+        height: 100vh;
+        background-color: #f6f6f7;
+        border-right: 1px solid #8c9196;
+    }
+</style>
+<div id="sub-menu" class="col-md-2">
+    <h2>Webhooks</h2>
+    <div class="row">
+        <div class="col-sm-12">
+            <a href="@Url.Action("WebhookBacklog", "Webhook", new { status = WebhookStatus.Saved})">Unprosessed </a>
+        </div>
+        <div class="col-sm-12">
+            <a href="@Url.Action("WebhookBacklog", "Webhook", new { status = WebhookStatus.Processed})">Processed </a>
+        </div>
+        <div class="col-sm-12">
+            <a href="@Url.Action("WebhookBacklog", "Webhook", new { status = WebhookStatus.Error})">Error</a>
+        </div>
+        <div class="col-sm-12">
+            <hr />
+            <a href="@Url.Action("index", "Log", new { status = WebhookStatus.Error})">Back to log</a>
+        </div>
+    </div>
+</div>
+<div id="content" class="col-md-10">
+    <table width="100%">
+        <tr>
+            <th>Shop Id</th>
+            <th>ID</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Date</th>
+        </tr>
+        @foreach (var item in Model.OrderByDescending(c => c.CreatedDate))
+        {
+            <tr class="webhook-row status-@item.Status">
+                <td>
+                    @item.TenantConfigId
+                </td>
+                <td>
+                    <a href="@Url.Action("Webhookdetail", "Webhook", new { webhookId = item.WebhookId })">@item.WebhookId</a>
+                </td>
+                <td>
+                    @item.Type
+                </td>
+                <td>
+                    @item.Status.ToString()
+                </td>
+                <td>
+                    @item.CreatedDate.ToString()
+                </td>
+                <td>
+                    <a href="@Url.Action("Webhookdetail", "Webhook", new { webhookId = item.WebhookId })">Details</a>
+                </td>
+            </tr>
+        }
+        @if (!Model.Any())
+        {
+            <tr>
+                <td>
+                    Everything is up to date...
+                </td>
+            </tr>
+        }
+    </table>
+</div>

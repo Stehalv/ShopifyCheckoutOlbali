@@ -1,0 +1,39 @@
+﻿@model CheckoutAccountModel
+
+<div class="modal" tabindex="-1" role="dialog" id="lookup-modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@Resources.Checkout.AccountModal_Header</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row text-center">
+                    @if (Model.HasShopAccount && Model.HasExigoAccount)
+                    {
+                        <div class="col-sm-12"><p>@Resources.Checkout.AccountModal_LogInMessage.FormatWith(ShopifyApp.Settings.CompanyName)</p></div>
+                    }
+                    else if (!Model.HasShopAccount && Model.HasExigoAccount)
+                    {
+                        <div class="col-sm-12"><strong>@Resources.Checkout.AccountModal_ActivateAccountMessage.FormatWith(ShopifyApp.Settings.CompanyName, Model.ShopUrl)</strong></div>
+                        <div class="col-sm-12 mt-3">
+                            <small>
+                                @Resources.Checkout.AccountModal_ActivateAccountInstructions
+                            </small>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="modal-footer">
+                @if (Model.HasShopAccount && Model.HasExigoAccount)
+                {
+                    <a class="btn btn-primary" href="https://@Model.ShopUrl/account/login">@Resources.Checkout.AccountModal_Login</a>
+                }
+                else if (!Model.HasShopAccount && Model.HasExigoAccount)
+                {
+                    <a class="btn btn-primary" href="@Url.Action("ActivateAccountByEmail", new { CustomerID = Model.CustomerID})">@Resources.Checkout.AccountModal_ActivateAccount</a>
+                }
+                <a class="btn btn-secondary" onclick="history.go(0)">@Resources.Checkout.AccountModal_Cancel</a>
+            </div>
+        </div>
+    </div>
+</div>

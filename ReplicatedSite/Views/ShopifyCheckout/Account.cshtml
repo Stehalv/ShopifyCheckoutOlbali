@@ -1,0 +1,413 @@
+﻿@model ShopifyCheckoutViewModel
+@using System.Globalization
+@{
+    ViewBag.Title = Resources.Checkout.Account_PageTitle;
+    ViewBag.PropertyBag = Model.PropertyBag;
+    var market = GlobalUtilities.GetCurrentMarket(this.Context);
+    var defaultCountryCode = market.MainCountry;
+    var countrySelectList = Html.Countries(defaultCountryCode);
+    var availableLanguages = Html.Languages();
+    var days = Enumerable.Range(1, 31).ToList();
+    var months = Enumerable.Range(1, 12).ToList();
+    List<SelectListItem> dayList = days.ConvertAll(a =>
+    {
+        return new SelectListItem()
+        {
+            Text = a.ToString(),
+            Value = a.ToString(),
+            Selected = (a == Model.PropertyBag.Customer.BirthDate.Day)
+        };
+    });
+    List<SelectListItem> monthList = months.ConvertAll(a =>
+    {
+        return new SelectListItem()
+        {
+            Text = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(a),
+            Value = a.ToString(),
+            Selected = (a == Model.PropertyBag.Customer.BirthDate.Month)
+        };
+    });
+
+}
+<style>
+    #modal-search-results {
+        width: 96.4%;
+        position: absolute;
+        top: 53px;
+        border: 1px solid #d9d9d9;
+        border-top: none;
+        border-bottom: 3px solid #d9d9d9;
+        padding: 0.9285714286em 0.7857142857em;
+        background-color: white;
+        z-index: 3;
+        margin-top:30px;
+        display: none;
+        max-height: 300px;
+        overflow: auto;
+    }
+
+
+        #modal-search-results::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        #modal-search-results::-webkit-scrollbar-track {
+            -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+            border-radius: 10px;
+        }
+
+        #modal-search-results::-webkit-scrollbar-thumb {
+            border-radius: 10px;
+            -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+        }
+</style>
+@using (Html.BeginForm())
+{
+    var contextID = Guid.NewGuid().ToString();
+    var defaultRegionCode = "";
+    var isVerifyable = ViewData["VerifyEnabled"] == null || Convert.ToBoolean(ViewData["VerifyEnabled"]) == true;
+    var address = new Address();
+
+    <div class="section" style="margin-top:20px;">
+        <div class="section__header">
+            <div class="layout-flex layout-flex--tight-vertical layout-flex--loose-horizontal layout-flex--wrap">
+                <h2 class="section__title layout-flex__item layout-flex__item--stretch">
+                    @Resources.Checkout.Information_AccountDetails
+                </h2>
+                @if (Model.PropertyBag.Customer.CustomerID == 0)
+                {
+                    <p class="layout-flex__item">
+                        @Resources.Checkout.Information_AlreadyHaveAnAccount
+                        <a href="https://@Model.PropertyBag.Cart.ShopUrl/account/login">
+                            @Resources.Checkout.Information_LogIn
+                        </a>
+                    </p>
+                }
+            </div>
+        </div>
+        <div class="section__content">
+            <div class="field field--show-floating-label">
+                <div class="field__input-wrapper">
+                    @Html.LabelFor(c => Model.PropertyBag.Customer.Email, new { @class = "field__label field__label--visible" })
+                    @Html.TextBoxFor(c => Model.PropertyBag.Customer.Email, new { @placeholder = Resources.Checkout.Email, @class = "field__input" })
+                    @Html.ValidationMessageFor(c => Model.PropertyBag.Customer.Email)
+                </div>
+            </div>
+            <div class="field field--half field--show-floating-label">
+                <div class="field__input-wrapper">
+                    @Html.LabelFor(c => Model.PropertyBag.Customer.Password, new { @class = "field__label field__label--visible" })
+                    @Html.PasswordFor(c => Model.PropertyBag.Customer.Password, new { @placeholder = Resources.Checkout.Account_Password, @class = "field__input" })
+                    @Html.ValidationMessageFor(c => Model.PropertyBag.Customer.Password)
+                </div>
+            </div>
+            <div class="field field--half field--show-floating-label">
+                <div class="field__input-wrapper">
+                    <label class="field__label field__label--visible">Confirm Password</label>
+                    <input type="password" class="field__input" id="confirmPassword"/>
+                    <span class="field-validation-valid" style="display:none" id="confirmPasswordValidation">Passwords do not match</span>
+                </div>
+            </div>
+            <div class="field field--half field--show-floating-label">
+                <div class="field__input-wrapper">
+                    @Html.LabelFor(c => Model.PropertyBag.Customer.FirstName, new { @class = "field__label field__label--visible" })
+                    @Html.TextBoxFor(c => Model.PropertyBag.Customer.FirstName, new { @placeholder = Resources.Checkout.FirstName, @class = "field__input" })
+                    @Html.ValidationMessageFor(c => Model.PropertyBag.Customer.FirstName)
+                </div>
+            </div>
+            <div class="field field--half field--show-floating-label">
+                <div class="field__input-wrapper">
+                    @Html.LabelFor(c => Model.PropertyBag.Customer.LastName, new { @class = "field__label field__label--visible" })
+                    @Html.TextBoxFor(c => Model.PropertyBag.Customer.LastName, new { @placeholder = Resources.Checkout.FirstName, @class = "field__input" })
+                    @Html.ValidationMessageFor(c => Model.PropertyBag.Customer.LastName)
+                </div>
+            </div>
+            <div class="field field--show-floating-label">
+                <div class="field__input-wrapper">
+                    @Html.LabelFor(c => Model.PropertyBag.Customer.PrimaryPhone, new { @class = "field__label field__label--visible" })
+                    @Html.TextBoxFor(c => Model.PropertyBag.Customer.PrimaryPhone, new { @placeholder = Resources.Checkout.Phone, @class = "field__input phone" })
+                    @Html.ValidationMessageFor(c => Model.PropertyBag.Customer.PrimaryPhone)
+                </div>
+            </div>
+            <div class="field field--show-floating-label">
+                <div class="field__input-wrapper field__input-wrapper--select">
+                    <label class="field__label field__label--visible">@Resources.Common.PreferredLanguage</label>
+                    @Html.DropDownListFor(c => Model.PropertyBag.Customer.LanguageID,
+                        selectList: availableLanguages,
+                        htmlAttributes: new
+                        {
+                            @class = "field__input field__input--select",
+                            data_role = "Language",
+                            placeholder = Resources.Common.Language
+                        })
+                    @Html.ValidationMessageFor(c => Model.PropertyBag.Customer.LanguageID)
+                </div>
+            </div>
+            <div class="field field--show-floating-label">
+                <h2>@Resources.Checkout.Account_YourBirthday</h2>
+                @Html.HiddenFor(c => c.PropertyBag.Customer.BirthDate)
+            </div>
+            <div class="field field--half field--show-floating-label">
+                <div class="field__input-wrapper">
+                    <label class="field__label field__label--visible">Day</label>
+                    @Html.DropDownListFor(c => Model.PropertyBag.BirthDay,
+                            selectList: dayList,
+                            htmlAttributes: new
+                            {
+                                @class = "field__input field__input--select",
+                                placeholder = Resources.Common.Day
+                            })
+                </div>
+            </div>
+            <div class="field field--half field--show-floating-label">
+                <div class="field__input-wrapper">
+                    <label class="field__label field__label--visible">Month</label>
+                    @Html.DropDownListFor(c => Model.PropertyBag.BirthMonth,
+                            selectList: monthList,
+                            htmlAttributes: new
+                            {
+                                @class = "field__input field__input--select",
+                                placeholder = Resources.Common.Month
+                            })
+                </div>
+            </div>
+            <div class="checkbox-wrapper">
+                <div class="checkout-buyer-accepts-marketing-wrapper">
+                    <div class="checkbox__input">
+                        @Html.CheckBoxFor(c => c.PropertyBag.AcceptsMarketing, new { @class = "input-checkbox" })
+                    </div>
+                    <label class="checkbox__label">
+                        @Resources.Checkout.Information_AcceptMarketingLabel
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="section">
+        <div class="section__header">
+            <h2 class="section__title" id="main-header" tabindex="-1">
+                @Resources.Checkout.Information_AddressHeading
+            </h2>
+        </div>
+        <div class="section__content">
+            <div class="content-box">
+                <div class="content-box__row">
+                    @Html.HiddenFor(c => address.AddressType, new { data_role = "AddressType" })
+                    <div class="field field--show-floating-label">
+                        <div class="field__input-wrapper field__input-wrapper--select">
+                            @Html.LabelFor(c => Model.PropertyBag.Customer.MainAddress.Country, new { @class = "field__label field__label--visible" })
+                            @Html.DropDownListFor(c => Model.PropertyBag.Customer.MainAddress.Country,
+                                selectList: countrySelectList,
+                                htmlAttributes: new
+                                {
+                                    @class = "field__input field__input--select",
+                                    data_region_bind = "#" + Html.IdFor(c => Model.PropertyBag.Customer.MainAddress.State) + "_" + contextID,
+                                    data_address_bind = "#" + Html.IdFor(c => Model.PropertyBag.Customer.MainAddress.Address2) + "_" + contextID,
+                                    data_role = "Country",
+                                    placeholder = Resources.Common.Country
+                                })
+                            @Html.ValidationMessageFor(c => Model.PropertyBag.Customer.MainAddress.Country)
+                        </div>
+                    </div>
+                    <div class="field field--show-floating-label">
+                        <div class="field__input-wrapper">
+                            @Html.LabelFor(c => Model.PropertyBag.Customer.MainAddress.Address1, new { @class = "field__label field__label--visible" })
+                            @Html.TextBoxFor(c => Model.PropertyBag.Customer.MainAddress.Address1, new { @placeholder = Resources.Common.StreetAddress, @class = "field__input" })
+                            @Html.ValidationMessageFor(c => Model.PropertyBag.Customer.MainAddress.Address1)
+                        </div>
+                    </div>
+                    <div class="field field--show-floating-label">
+                        <div class="field__input-wrapper">
+                            @Html.LabelFor(c => Model.PropertyBag.Customer.MainAddress.Address2, new { @class = "field__label field__label--visible" })
+                            @Html.TextBoxFor(c => Model.PropertyBag.Customer.MainAddress.Address2, new { @placeholder = Resources.Common.Address2Placeholder, @class = "field__input" })
+                            @Html.ValidationMessageFor(c => Model.PropertyBag.Customer.MainAddress.Address2)
+                        </div>
+                    </div>
+
+                    <div id="state-address-field" class="field field--show-floating-label" @if (defaultCountryCode != "US") { <text> style="display: none;" </text> }>
+                        <div class="field__input-wrapper field__input-wrapper--select">
+                            @Html.LabelFor(c => Model.PropertyBag.Customer.MainAddress.State, new { @class = "field__label field__label--visible" })
+                            @Html.DropDownListFor(c => Model.PropertyBag.Customer.MainAddress.State,
+                                selectList: Html.Regions(defaultCountryCode, defaultRegionCode),
+                                htmlAttributes: new
+                                {
+                                    @class = "field__input field__input--select",
+                                    data_role = "Country",
+                                    placeholder = Resources.Common.State
+                                })
+                            @Html.ValidationMessageFor(c => Model.PropertyBag.Customer.MainAddress.State)
+                        </div>
+                    </div>
+                    <div class="field field--half field--show-floating-label">
+                        <div class="field__input-wrapper">
+                            @Html.LabelFor(c => Model.PropertyBag.Customer.MainAddress.City, new { @class = "field__label field__label--visible" })
+                            @Html.TextBoxFor(c => Model.PropertyBag.Customer.MainAddress.City, new { @placeholder = Resources.Common.City, @class = "field__input" })
+                            @Html.ValidationMessageFor(c => Model.PropertyBag.Customer.MainAddress.City)
+                        </div>
+                    </div>
+                    <div class="field field--half field--show-floating-label">
+                        <div class="field__input-wrapper">
+                            @Html.LabelFor(c => Model.PropertyBag.Customer.MainAddress.Zip, new { @class = "field__label field__label--visible" })
+                            @Html.TextBoxFor(c => Model.PropertyBag.Customer.MainAddress.Zip, new { @placeholder = Resources.Common.Zip, @class = "field__input" })
+                            @Html.ValidationMessageFor(c => Model.PropertyBag.Customer.MainAddress.Zip)
+                        </div>
+                    </div>
+                    <div class="checkbox-wrapper">
+                        <div class="checkout-shipping-same-as-account">
+                            <div class="checkbox__input">
+                                @Html.CheckBoxFor(c => c.PropertyBag.ShippingAddressSameAsMain, new { @class = "input-checkbox" })
+                            </div>
+                            <label class="checkbox__label">
+                                @Resources.Checkout.Information_ShoppingSameAsMain
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button id="new-address" style="margin-top:20px;" data-role="submit_new_address" type="submit" class="btn btn-primary float-right" data-loading-text="@Resources.Common.Saving">@Resources.Checkout.Information_ContinueButton</button>
+}
+
+<div class="modal" role="dialog" id="enroller-modal" data-backdrop="static">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@Resources.Checkout.EnrollerSearch_ModalHeader</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h6 class="text-center">@Resources.Checkout.EnrollerSearch_ModalText</h6>
+                <div id="enroller-search" class="enroller-toggle">
+                    <div class="field field--show-floating-label">
+                        <div class="field__input-wrapper">
+                            <label class="field__label field__label--visible">@Resources.Checkout.EnrollerSearch_InputPlaceholder.</label>
+                            <input type="text" id="enroller-modal-search-field" class="field__input" />
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div id="modal-search-results">
+                            @Resources.Checkout.EnrollerSearch_NoResult
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">@Resources.Checkout.EnrollerSearch_ModalClose</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    require(["jquery", "toastr", 'mask', 'handlebars', 'bootstrap'], function ($, toastr, mask, handlebars) {
+        var isOrphan = (@Identity.Owner.CustomerID == @GlobalSettings.ReplicatedSites.DefaultAccountID);
+
+        function newlink(webalias) {
+            var link = location.href.toLowerCase();
+            return link.replace("/@Identity.Owner.WebAlias.ToLower()/", "/" + webalias + "/");
+        }
+        $('.phone').mask('@market.PhoneMask');
+        var hasError = @Model.ErrorMessage.IsNotNullOrEmpty().ToString().ToLower();
+        if (hasError) {
+            toastr.error("@Model.ErrorMessage")
+        }
+        if (isOrphan) {
+            $("#enroller-modal").modal("show");
+        }
+        $('form').on("submit", function (e) {
+            var isValid = $(this).valid();
+            isValid = actions.confirmPassword();
+            if (isValid) {
+                var button = $(this).find(':submit');
+                var text = button.data("loading-text");
+                button.html(text);
+            } else {
+                e.preventDefault();
+            }
+        });
+        $("#confirmPassword").on("focusout", function () {
+            var isEqual = actions.confirmPassword();
+            if (!isEqual) {
+                $("#confirmPasswordValidation").show();
+            } else {
+                $("#confirmPasswordValidation").hide();
+            }
+        });
+        $("#enroller-modal-search-field").on("keyup", function () {
+            var query = $(this).val();
+            $.ajax({
+                url: "@Url.Action("getdistributors", "ShopifyCheckout")",
+                data: { query: query },
+                type: "POST",
+                success: function (response) {
+                    if (response.success) {
+                        if (response.enrollers.length == 0) {
+                            $("#modal-search-results").html("@Resources.Common.SearchNoResults");
+                        }
+                        for (const e of response.enrollers) {
+                            e["url"] = newlink(e.WebAlias);
+                        }
+                        var source = $("#search-results-template").html();
+                        var template = handlebars.compile(source);
+                        var html = template(response);
+                        $("#modal-search-results").html(html);
+                        $("#modal-search-results").show();
+                    }
+                    else {
+                        $("#search-results").html("@Resources.Checkout.EnrollerSearch_Error");
+                    }
+                }
+            });
+        });
+        $('#PropertyBag_Customer_MainAddress_Country').change(function () {
+            var value = $(this).val();
+            actions.populateStatesDropdown(value);
+        });
+        $('[name="PropertyBag.Customer.Email"]').on("focusout", function () {
+            var email = $(this).val();
+            if (email != "") {
+            $.ajax({
+                url: '@Url.Action("CustomerLookup")',
+                data: { email: email },
+                type: 'POST',
+                success: function (response) {
+                    if (response.success) {
+                        $("#account-modal").html(response.html);
+                        $("#lookup-modal").modal({ backdrop: 'static', keyboard: false });
+                    }
+                }
+            });
+            }
+        });
+        var actions = {
+            populateStatesDropdown: function (country) {
+                $.ajax({
+                    url: '@Url.Action("GetRegions", "App")',
+                    data: { id: country },
+                    success: function (response) {
+                        if (response.regions.length == 0) {
+                            $("#state-address-field").hide();
+                            $('#PropertyBag_Customer_MainAddress_State').html("");
+                        } else {
+                            $("#state-address-field").show();
+                            var html = "";
+                            for (let i = 0; i < response.regions.length; i++) {
+                                var r = response.regions[i];
+                                html += '<option value="' + r.RegionCode + '">' + r.RegionName + '</option>';
+                            }
+                            $('#PropertyBag_Customer_MainAddress_State').html(html);
+                        }
+                    }
+                })
+            },
+            confirmPassword: function () {
+                if ($("#PropertyBag_Customer_Password").val() != $("#confirmPassword").val()) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        }
+    });
+</script>

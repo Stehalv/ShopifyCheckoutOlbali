@@ -1,0 +1,97 @@
+﻿@model ShopifyApp.Models.Cart
+@{
+    var clearCart = (Model.Completed) ? "?clearcart=true" : "";
+}
+<section id="nav__section" style="margin-bottom:15px;">
+    <div class="row justify-flex-column-center">
+        <div class="col-md-12 corporate-logo-container-main">
+            <a class="" href="https://@Model.ShopUrl@clearCart">
+                <img class="lab-logo" src="@UXSettings.LogoLink">
+            </a>
+        </div>
+    </div>
+    <div class="row" style="margin-top:15px;">
+        @if (Model.IsPaymentOfExistingOrder)
+        {
+
+            <div class="col-md-12">
+                <h1>Order Payment</h1>
+            </div>
+        }
+        else
+        {
+            <div class="col-md-12 breadcrumb-list">
+                @if (!Model.Completed)
+                {
+                    <a class="breadcrumb__item link" href="https://@Model.ShopUrl/cart">@Resources.Checkout.BreadCrumb_Cart</a>
+                    <i class="fa fa-angle-right breadcrumb-separator"></i>
+                }
+                @if (Model.CustomerId == 0 && !Model.Completed)
+                {
+                    <a class="breadcrumb__item link" href="@Url.Action("Account","ShopifyCheckout")">@Resources.Checkout.BreadCrumb_Account</a>
+                    <i class="fa fa-angle-right breadcrumb-separator"></i>
+                }
+                else if (Model.CustomerId == 0)
+                {
+                    <span class="breadcrumb__item">@Resources.Checkout.BreadCrumb_Account</span>
+                    <i class="fa fa-angle-right breadcrumb-separator"></i>
+                }
+                @if (Model.Account && !Model.Completed && Model.OrderItems.Any())
+                {
+                    <a class="breadcrumb__item link" href="@Url.Action("ShippingAddress","ShopifyCheckout")">@Resources.Checkout.BreadCrumb_ShippingAddress</a>
+                    <i class="fa fa-angle-right breadcrumb-separator"></i>
+                }
+                else if (Model.OrderItems.Any() || Model.EnrollmentPackItems.Any())
+                {
+                    <span class="breadcrumb__item">@Resources.Checkout.BreadCrumb_ShippingAddress</span>
+                    <i class="fa fa-angle-right breadcrumb-separator"></i>
+                }
+                @if (Model.CartType == ShopifyApp.CartType.Enrollment)
+                {
+                    if (Model.ShippingAddress && !Model.Completed)
+                    {
+                        <a class="breadcrumb__item link" href="@Url.Action("EnrollmentInfo","ShopifyCheckout")">@Resources.Checkout.BreadCrumb_EnrollmentInfo</a>
+                    }
+                    else
+                    {
+                        <span class="breadcrumb__item">@Resources.Checkout.BreadCrumb_EnrollmentInfo</span>
+                    }
+                    <i class="fa fa-angle-right breadcrumb-separator"></i>
+                }
+                @if (Model.AutoOrderItems != null && Model.AutoOrderItems.Any())
+                {
+                    if (Model.AutoOrder && !Model.Completed)
+                    {
+                        <a class="breadcrumb__item link" href="@Url.Action("autoorder","ShopifyCheckout")">@Resources.Checkout.BreadCrumb_AutoOrder</a>
+                    }
+                    else
+                    {
+                        <span class="breadcrumb__item">@Resources.Checkout.BreadCrumb_AutoOrder</span>
+                    }
+                    <i class="fa fa-angle-right breadcrumb-separator"></i>
+                }
+                @if (Model.AutoOrderItems.Any() && Model.AutoOrder && !Model.Completed)
+                {
+                    <a class="breadcrumb__item link" href="@Url.Action("payment","ShopifyCheckout")">@Resources.Checkout.BreadCrumb_Payment</a>
+                }
+                else if (Model.CartType != ShopifyApp.CartType.Enrollment && Model.ShippingAddress && !Model.Completed)
+                {
+                    <a class="breadcrumb__item link" href="@Url.Action("payment","ShopifyCheckout")">@Resources.Checkout.BreadCrumb_Payment</a>
+                }
+                else if (Model.CartType == ShopifyApp.CartType.Enrollment && Model.EnrollmentInfo && !Model.Completed)
+                {
+                    <a class="breadcrumb__item link" href="@Url.Action("payment","ShopifyCheckout")">@Resources.Checkout.BreadCrumb_Payment</a>
+                }
+                else
+                {
+                    <span class="breadcrumb__item">@Resources.Checkout.BreadCrumb_Payment</span>
+                }
+                @if (Model.Completed)
+                {
+                    <i class="fa fa-angle-right breadcrumb-separator"></i>
+                    <span class="breadcrumb__item">@Resources.Checkout.BreadCrumb_ThankYou</span>
+                }
+            </div>
+        }
+    </div>
+</section>

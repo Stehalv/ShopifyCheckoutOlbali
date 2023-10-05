@@ -1,0 +1,118 @@
+﻿@model ShopifyApp.Models.PriceRuleModel
+
+@{
+    ViewBag.Title = "View";
+}
+
+<h2>Price Rules</h2>
+
+
+@using (Html.BeginForm()) 
+{
+    @Html.AntiForgeryToken()
+    
+<div class="form-horizontal">
+    <h4>Create new</h4>
+    <hr />
+    @Html.HiddenFor(c => c.TenantConfigId)
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Title, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.TargetType, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownListFor(model => model.TargetType, Model.TargetTypes, new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.TargetType, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.TargetSelection, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownListFor(model => model.TargetSelection, Model.TargetSelections, new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.TargetSelection, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.AllocationMethod, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownListFor(model => model.AllocationMethod, Model.AllocationMethods, new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.AllocationMethod, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.ValueType, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownListFor(model => model.ValueType, Model.ValueTypes, new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.ValueType, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Value, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.TextBoxFor(model => model.Value, new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.Value, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.OncePerCustomer, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.CheckBoxFor(model => model.OncePerCustomer, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.OncePerCustomer, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.UsageLimit, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.UsageLimit, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.UsageLimit, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.CustomerSelection, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownListFor(model => model.CustomerSelection, Model.CustomerSelections, new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.CustomerSelection, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-md-2">Customer segments</label>
+        <div class="col-md-10">
+            @for (var i = 0; i < Model.SavedSearches.Count(); i++)
+            {
+                var role = Model.SavedSearches[i];
+                @Html.HiddenFor(model => model.SavedSearches[i].Id)
+                @Html.CheckBoxFor(model => model.SavedSearchesList[i].Selected)
+                @Html.LabelFor(model => model.SavedSearches[i].Name, role.Name)
+                <br />
+            }
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Create" class="btn btn-default" />
+        </div>
+    </div>
+</div>
+}
+
+<div>
+    <a href="@Url.Action("PriceRules", "TenantConfigurations", new { id = Model.TenantConfigId })">Back to list</a>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

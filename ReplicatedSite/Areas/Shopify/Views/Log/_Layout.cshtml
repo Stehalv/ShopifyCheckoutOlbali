@@ -1,0 +1,30 @@
+﻿@using ReplicatedSite;
+@{ 
+
+    Layout = "~/Areas/Shopify/Views/Shared/_Layout.cshtml";
+}  
+<style>
+    #sub-menu {
+        height: 100vh;
+        background-color: #f6f6f7;
+        border-right: 1px solid #8c9196;
+    }
+
+</style>
+<div id="sub-menu" class="col-md-2">
+    <h3>@ViewBag.Title</h3>
+    <ul>
+        @if (ShopifyApp.Settings.IsAdmin(Identity.Current.UserRole))
+        {
+            <li>
+                <a href="@Url.Action("WebhookBacklog", "webhook", new { Status = WebhookStatus.Saved })">Webhook Backlog</a>
+            </li>
+        }
+        <li>
+            <a href="@Url.Action("ClearLog", "Log")">Clear Log</a>
+        </li>
+    </ul>
+</div>  
+<div id="content" class="col-md-10">
+    @RenderBody()
+</div>

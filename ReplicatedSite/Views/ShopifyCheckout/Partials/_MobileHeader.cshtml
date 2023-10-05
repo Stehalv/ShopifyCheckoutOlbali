@@ -1,0 +1,9 @@
+﻿@model ShopifyApp.Models.Cart
+    <div class="row justify-flex-column-center">
+        <div class="col-md-12 corporate-logo-container">
+            <a class="" href="https://@Model.ShopUrl">
+                <img class="lab-logo" src="@ShopifyApp.Settings.CompanyCheckoutLogo">
+            </a>
+        </div>
+    </div>
+    @Html.Partial("Partials/_MobileCart", Model)

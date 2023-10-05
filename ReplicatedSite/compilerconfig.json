@@ -1,0 +1,22 @@
+﻿[
+  {
+    "outputFile": "Content/styles/site.css",
+    "inputFile": "Content/styles/site.scss"
+  },
+  {
+    "outputFile": "Content/styles/vendor/Bootstrap/bootstrap.css",
+    "inputFile": "Content/styles/vendor/Bootstrap/bootstrap.scss"
+  },
+  {
+    "outputFile": "Content/styles/components/_style.css",
+    "inputFile": "Content/styles/components/_style.scss"
+  },
+  {
+    "outputFile": "Content/styles/ShopifyCheckout.css",
+    "inputFile": "Content/styles/ShopifyCheckout.scss"
+  },
+  {
+    "outputFile": "Content/styles/ShopifyAccount.css",
+    "inputFile": "Content/styles/ShopifyAccount.scss"
+  }
+]

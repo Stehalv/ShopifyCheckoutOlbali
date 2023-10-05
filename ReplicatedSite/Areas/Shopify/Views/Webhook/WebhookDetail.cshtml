@@ -1,0 +1,173 @@
+﻿@model ReplicatedSite.Areas.Shopify.ViewModels.WebhookViewModel
+@{
+    ViewBag.Title = "Webhook details #" + Model.WebhookId;
+    Layout = "~/Areas/Shopify/Views/Shared/_Layout.cshtml";
+}
+<style>
+    #sub-menu {
+        height: 100vh;
+        background-color: #f6f6f7;
+        border-right: 1px solid #8c9196;
+    }
+</style>
+<div id="sub-menu" class="col-md-2">
+    <div class="col-12">
+        <h2>Details</h2>
+        <dl>
+            <dt>ID</dt>
+            <dd>
+                @Model.WebhookId
+            </dd>
+        </dl>
+        <dl>
+            <dt>Type</dt>
+            <dd>
+                @Model.Hook.Type
+            </dd>
+        </dl>
+        <dl>
+            <dt>Status</dt>
+            <dd>
+                @if (Model.Hook.Status == (int)WebhookStatus.Saved)
+                {
+                    <span>Not Processed</span>
+                }
+                else if (Model.Hook.Status == (int)WebhookStatus.Error)
+                {
+                    <span>Process error</span>
+                }
+                else if (Model.Hook.Status == (int)WebhookStatus.Processed)
+                {
+                    <span>Processed</span>
+                }
+                else if (Model.Hook.Status == (int)WebhookStatus.None)
+                {
+                    <span>Unspecified</span>
+                }
+            </dd>
+        </dl>
+    </div>
+    <div class="col-sm-12">
+        @if (Model.Hook.Status == (int)WebhookStatus.Processed)
+        {
+            <a href="@Url.Action("ProcessWebhook", "Webhook", new { webhookId = Model.WebhookId })">Process webhook again (CAUTION, might create duplicate orders)</a>
+        }
+        else
+        {
+            <a href="@Url.Action("ProcessWebhook", "Webhook", new { webhookId = Model.WebhookId })">Process webhook</a>
+        }
+    </div>
+    <div class="col-sm-12">
+        <hr />
+        <a href="@Url.Action("WebhookBacklog", "Webhook", new { status = Model.Hook.Status })">Back to Webhooks</a>
+    </div>
+</div>
+<div id="content" class="col-md-10">
+    <div class="row">
+        <div class="col-12" style="margin-left:20px">
+            <div class="row">
+                <div class="col-12">
+                    <h3>Log</h3>
+                    <table width="100%">
+                        <tr>
+                            <th>Type</th>
+                            <th>Section</th>
+                            <th>Message</th>
+                            <th>Date</th>
+                        </tr>
+                        @foreach (var log in Model.MainLog)
+                        {
+                            <tr>
+                                <td>
+                                    @log.LogType
+                                </td>
+                                <td>
+                                    @if (log.LogSection == (int)LogSection.Customers)
+                                    {
+                                        <span>Customer</span>
+                                    }
+                                    else if (log.LogSection == (int)LogSection.Global)
+                                    {
+                                        <span>Global</span>
+                                    }
+                                    else if (log.LogSection == (int)LogSection.Orders)
+                                    {
+                                        <span>Order</span>
+                                    }
+                                    else if (log.LogSection == (int)LogSection.Tenant)
+                                    {
+                                        <span>Tenant</span>
+                                    }
+                                    else if (log.LogSection == (int)LogSection.Webhooks)
+                                    {
+                                        <span>Webhooks</span>
+                                    }
+                                </td>
+                                <td>@log.Message</td>
+                                <td>@log.CreatedDate.ToString()</td>
+                            </tr>
+                        }
+                        @if (Model.MainLog.Count() == 0)
+                        {
+                            <tr>
+                                <td>No Log Items</td>
+                            </tr>
+                        }
+                    </table>
+                    <hr />
+                    @if (Model.OrderLog.Count > 0)
+                    {
+                        <h3>OrderLog</h3>
+                        <table width="100%">
+                            <tr>
+                                <th>OrderId</th>
+                                <th>Message</th>
+                                <th>Date</th>
+                            </tr>
+                            @foreach (var log in Model.OrderLog)
+                            {
+                                <tr>
+                                    <td><a href="@Url.Action("OrderDetails", "Order", new { id = log.OrderId })">@log.OrderId</a></td>
+                                    <td>@log.Message</td>
+                                    <td>@log.CreatedDate.ToString()</td>
+                                </tr>
+                            }
+                        </table>
+                        <hr />
+                    }
+                    @if (Model.CustomerLog.Count > 0)
+                    {
+                        <h3>CustomerLog</h3>
+                        <table width="100%">
+                            <tr>
+                                <th>CustomerId</th>
+                                <th>Message</th>
+                                <th>Date</th>
+                            </tr>
+                            @foreach (var log in Model.CustomerLog)
+                            {
+                                <tr>
+                                    <td><a href="@Url.Action("CustomerDetails", "Customer", new { id = log.CustomerId })">@log.CustomerId</a></td>
+                                    <td>@log.Message</td>
+                                    <td>@log.CreatedDate.ToString()</td>
+                                </tr>
+                            }
+                        </table>
+                        <hr />
+                    }
+                </div>
+            </div>
+            <hr/>
+            <h3>Webhook body:</h3>
+            <pre id="json-@Model.WebhookId">@Model.Hook.WebhookBody</pre></
+        </div>
+    </div>
+</div>
+<script>
+    function formatJson() {
+        var element = $("#json-@Model.WebhookId");
+        var obj = JSON.parse(element.text());
+        element.html(JSON.stringify(obj, undefined, 2));
+    }
+    formatJson();
+</script>

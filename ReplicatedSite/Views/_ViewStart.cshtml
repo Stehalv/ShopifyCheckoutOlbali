@@ -1,0 +1,11 @@
+﻿@{
+    var controller = Request.RequestContext.RouteData.Values["controller"].ToString();
+    if(controller.ToLower() == "shopifycheckout" || controller.ToLower() == "accountiframe")
+    {
+        Layout = "~/Views/{0}/_DefaultLayout.cshtml".FormatWith(controller);
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_DefaultLayout.cshtml";
+    }
+}

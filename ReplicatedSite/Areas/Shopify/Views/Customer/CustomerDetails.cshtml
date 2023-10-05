@@ -1,0 +1,198 @@
+﻿@model ReplicatedSite.Areas.Shopify.ViewModels.CustomerDetailViewModel
+@{
+    ViewBag.Title = "Customer Details #" + Model.Id;
+    Layout = "~/Areas/Shopify/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <style>
+        #sub-menu {
+            height: 100vh;
+            background-color: #f6f6f7;
+            border-right: 1px solid #8c9196;
+        }
+    </style>
+    <div id="sub-menu" class="col-md-2">
+        <h3>Customer details</h3>
+        <div class="col-12">
+            <dl>
+                <dt>
+                    Exigo Customer#
+                </dt>
+                <dd>
+                    @Model.ExigoCustomer.CustomerID
+                </dd>
+                <dt>
+                    Shopify Customer#
+                </dt>
+                <dd>
+                    @Model.ShopifyCustomer.Id.Value
+                </dd>
+            </dl>
+        </div>
+        <div class="col-sm-12">
+            <hr />
+            <a data-role="display" data-id="summary">Summary</a>
+        </div>
+        <div class="col-sm-12">
+            <a data-role="display" data-id="exigo">Exigo Customer</a>
+        </div>
+        <div class="col-sm-12">
+            <a data-role="display" data-id="shopify">Shopify Customer</a>
+        </div>
+        <div class="col-sm-12">
+            <a data-role="createtoken">Update Customer</a>
+        </div>
+        <div class="col-sm-12">
+            <hr />
+            <a href="@Url.Action("Index", "Customer")">Back to Customer</a>
+        </div>
+    </div>
+    <div id="content" class="col-md-10" style="padding:20px">
+        <div class="row content-container" id="summary">
+            <div class="col-xs-4">
+                <dl>
+                    <dt>
+                        Fullname:
+                    </dt>
+                    <dd>
+                        @Model.ShopifyCustomer.FirstName @Model.ShopifyCustomer.LastName
+                    </dd>
+                    @if (Model.ShopifyCustomer.DefaultAddress != null)
+                    {
+                        <dt>
+                            Address:
+                        </dt>
+                        <dd>
+                            @Model.ShopifyCustomer.DefaultAddress.Address1
+                        </dd>
+                        <dd>
+                            @Model.ShopifyCustomer.DefaultAddress.City @Model.ShopifyCustomer.DefaultAddress.Zip
+                        </dd>
+                        <dt>
+                            Country
+                        </dt>
+                        <dd>
+                            @Model.ShopifyCustomer.DefaultAddress.Country
+                        </dd>
+                    }
+
+                    <dt>
+                        Email
+                    </dt>
+                    <dd>
+                        @Model.ShopifyCustomer.Email
+                    </dd>
+                    @if (Model.Customer.Id != 0)
+                    {
+                        <dt>
+                            Synced Date
+                        </dt>
+                        <dd>
+                            @Model.Customer.CreatedDate.ToString()
+                        </dd>
+                    }
+                </dl>
+            </div>
+            <div class="col-xs-8">
+                <h3>Customer Log</h3>
+                @if (Model.Customer.Id != 0)
+                {
+                    <table width="100%">
+                        <tr>
+                            <th>Message</th>
+                            <th>Date</th>
+                        </tr>
+                        @foreach (var log in Model.Log)
+                        {
+                            <tr>
+                                <td>@log.Message</td>
+                                <td>@log.CreatedDate.ToString()</td>
+                            </tr>
+                        }
+                    </table>
+                }
+                else
+                {
+                    <h6>Customer not synced from shopify</h6>
+                }
+                <hr />
+            </div>
+        </div>
+
+        <div class="row content-container" id="shopify" style="display:none">
+            <div class="col-xs-6">
+                <h2>Shop Customer</h2>
+                <dl>
+                    <dt>Customer#</dt>
+                    <dd></dd>
+                </dl>
+            </div>
+            <div class="col-xs-6">
+                <pre id="json-shopify">@Model.ShopifyCustomerJson</pre>
+            </div>
+        </div>
+
+        <div class="row content-container" id="orders" style="display:none">
+            <div class="col-xs-6">
+                <h2>Customer orders</h2>
+                <table width="100%">
+                    <tr>
+                        <th>
+                            OrderId
+                        </th>
+                        <th>
+                            ExigoOrderId
+                        </th>
+                        <th>
+                            ShopifyOrderId
+                        </th>
+                        <th>
+                            Amount
+                        </th>
+                        <th>
+                            Actions
+                        </th>
+                    </tr>
+                    @foreach(var order in Model.Orders)
+                    {
+                        <tr>
+                            <td>@order.Id</td>
+                            <td>@order.ExigoOrderId</td>
+                            <td>@order.ShopOrderId</td>
+                            <td>@order.OrderTotal.ToString("c")</td>
+                            <td><a href="@Url.Action("OrderDetails", "Order", new { id = order.Id })">Details</a></td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $('[data-role="display"]').on("click", function () {
+        var id = $(this).data("id");
+        $(".content-container").hide();
+        $("#" + id).show();
+    });
+
+    $('[data-role="createtoken"]').on("click", function () {
+        $.ajax({
+            url: "@Url.Action("UpdateCustomer", "Customer", new { customerId = Model.Customer.Id })",
+            success: function (response) {
+                if (response) {
+                    alert("Token created!");
+                } else {
+                    alert("Error with creating token: Might already exist");
+                }
+            }
+        })
+    });
+    function formatJson(id) {
+        var element = $("#json-" + id);
+        var obj = JSON.parse(element.text());
+        element.html(JSON.stringify(obj, undefined, 2));
+    }
+    formatJson("shopify");
+    formatJson("exigo");
+</script>
